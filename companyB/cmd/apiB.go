@@ -34,16 +34,28 @@ func main() {
 	}
 }
 
-func handleA(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("localhost:9876/callA")
-	if err != nil {
-		fmt.Println("problem")
+func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+}
 
+func handleA(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	resp, err := http.Get("http://localhost:9876/callA")
+	if err != nil {
+		fmt.Println("problem", err)
+		return
+	}
+	fmt.Println(resp)
 	b, _ := io.ReadAll(resp.Body)
 
-	w.Write([]byte(b))
+	w.Write(b)
 }
 
 func handleC(w http.ResponseWriter, r *http.Request) {

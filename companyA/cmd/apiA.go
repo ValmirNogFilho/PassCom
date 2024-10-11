@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -32,6 +33,23 @@ func main() {
 	}
 }
 
+func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+}
+
 func callA(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("hellooooo"))
+	allowCrossOrigin(w, r)
+	resp := map[string]string{
+		"resp": "hellooooo",
+	}
+
+	json.NewEncoder(w).Encode(resp)
+
 }
