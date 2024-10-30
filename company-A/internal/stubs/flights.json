@@ -1,0 +1,86 @@
+[
+  {
+    "OriginAirportID": 4,
+    "DestinationAirportID": 5,
+    "Passengers": [],
+    "Seats": 150
+  },
+  {
+    "OriginAirportID": 6,
+    "DestinationAirportID": 7,
+    "Passengers": [],
+    "Seats": 120
+  },
+  {
+    "OriginAirportID": 8,
+    "DestinationAirportID": 9,
+    "Passengers": [],
+    "Seats": 180
+  },
+  {
+    "OriginAirportID": 10,
+    "DestinationAirportID": 11,
+    "Passengers": [],
+    "Seats": 200
+  },
+  {
+    "OriginAirportID": 12,
+    "DestinationAirportID": 13,
+    "Passengers": [],
+    "Seats": 145
+  },
+  {
+    "OriginAirportID": 14,
+    "DestinationAirportID": 15,
+    "Passengers": [],
+    "Seats": 160
+  },
+  {
+    "OriginAirportID": 16,
+    "DestinationAirportID": 17,
+    "Passengers": [],
+    "Seats": 130
+  },
+  {
+    "OriginAirportID": 18,
+    "DestinationAirportID": 19,
+    "Passengers": [],
+    "Seats": 155
+  },
+  {
+    "OriginAirportID": 20,
+    "DestinationAirportID": 21,
+    "Passengers": [],
+    "Seats": 170
+  },
+  {
+    "OriginAirportID": 22,
+    "DestinationAirportID": 23,
+    "Passengers": [],
+    "Seats": 140
+  },
+  {
+    "OriginAirportID": 24,
+    "DestinationAirportID": 25,
+    "Passengers": [],
+    "Seats": 165
+  },
+  {
+    "OriginAirportID": 26,
+    "DestinationAirportID": 27,
+    "Passengers": [],
+    "Seats": 150
+  },
+  {
+    "OriginAirportID": 28,
+    "DestinationAirportID": 29,
+    "Passengers": [],
+    "Seats": 175
+  },
+  {
+    "OriginAirportID": 30,
+    "DestinationAirportID": 4,
+    "Passengers": [],
+    "Seats": 190
+  }
+]

@@ -9,6 +9,11 @@ import (
 	"syscall"
 )
 
+const (
+	urlA = "http://localhost:9876"
+	urlC = "http://localhost:9878"
+)
+
 func main() {
 	srv := &http.Server{Addr: ":9877"}
 
@@ -47,7 +52,7 @@ func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
 
 func handleA(w http.ResponseWriter, r *http.Request) {
 	allowCrossOrigin(w, r)
-	resp, err := http.Get("http://localhost:9876/callA")
+	resp, err := http.Get(urlA + "/callA")
 	if err != nil {
 		fmt.Println("problem", err)
 		return
@@ -59,5 +64,14 @@ func handleA(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleC(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	resp, err := http.Get(urlC + "/callC")
+	if err != nil {
+		fmt.Println("problem", err)
+		return
+	}
+	fmt.Println(resp)
+	b, _ := io.ReadAll(resp.Body)
 
+	w.Write(b)
 }

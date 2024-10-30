@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,6 +11,8 @@ import (
 
 func main() {
 	srv := &http.Server{Addr: ":9878"}
+
+	http.HandleFunc("/callC", callC)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -39,4 +42,14 @@ func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+}
+
+func callC(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	resp := map[string]string{
+		"resp": "hellooooo",
+	}
+
+	json.NewEncoder(w).Encode(resp)
+
 }
