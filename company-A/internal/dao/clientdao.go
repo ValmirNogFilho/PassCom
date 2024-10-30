@@ -132,7 +132,26 @@ func (dao *DBClientDAO) FindById(id uint) (*models.Client, error) {
 	defer utils.CloseDb(db)
 
 	var client models.Client
-	if err := db.First(&client, "id = ?", id).Error; err != nil {
+	if err := db.Preload("ClientFlights").Take(&client, "id = ?", id).Error; err != nil {
+		log.Println("Error searching client:", err)
+		return nil, err
+	}
+	log.Println("Client found:", client)
+	return &client, nil
+}
+
+func (dao *DBClientDAO) FindByUsername(username string) (*models.Client, error) {
+	db, err := utils.OpenDb()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	var client models.Client
+	if err := db.Where(&models.Client{
+		Username: username,
+	}).Take(&client).Error; err != nil {
 		log.Println("Error searching client:", err)
 		return nil, err
 	}

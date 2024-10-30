@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"vendepass/internal/dao"
@@ -25,6 +26,7 @@ func mockAirports() {
 	dao := dao.GetAirportDAO()
 	for _, airport := range airports {
 		dao.Insert(airport)
+		fmt.Print("%d ", airport.ID)
 	}
 }
 
@@ -71,4 +73,10 @@ func mockFlights() {
 		flight.DestinationAirport = *dest
 		flightdao.Insert(flight)
 	}
+}
+
+func main() {
+	mockAirports()
+	mockFlights()
+	mockClients()
 }

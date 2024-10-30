@@ -7,7 +7,6 @@ import (
 )
 
 type DBFlightDAO struct {
-	// data map[uuid.UUID]map[uuid.UUID]*models.Flight
 }
 
 func (dao *DBFlightDAO) New() {
@@ -103,7 +102,7 @@ func (dao *DBFlightDAO) FindById(id uint) (*models.Flight, error) {
 
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
-		First(&flight, id).Error; err != nil {
+		Preload("Tickets").First(&flight, "id=?", id).Error; err != nil {
 		log.Println("Error searching flight:", err)
 		return nil, err
 	}
@@ -122,9 +121,9 @@ func (dao *DBFlightDAO) FindBySource(id uint) ([]models.Flight, error) {
 	var flights []models.Flight = make([]models.Flight, 0)
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
-		Where(&models.Flight{
-			OriginAirportID: id,
-		}).Find(&flights).Error; err != nil {
+		Preload("Tickets").Where(&models.Flight{
+		OriginAirportID: id,
+	}).Find(&flights).Error; err != nil {
 		log.Println("Error searching flights:", err)
 		return nil, err
 	}
@@ -144,6 +143,7 @@ func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) (*models.Fli
 	var flight models.Flight
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
+		Preload("Tickets").
 		Where(&models.Flight{
 			OriginAirportID:      source,
 			DestinationAirportID: dest,

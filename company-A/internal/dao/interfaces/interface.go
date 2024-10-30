@@ -26,6 +26,7 @@ type ClientDAO interface {
 	Update(models.Client) error
 	Delete(models.Client)
 	FindById(uint) (*models.Client, error)
+	FindByUsername(username string) (*models.Client, error)
 	New()
 }
 

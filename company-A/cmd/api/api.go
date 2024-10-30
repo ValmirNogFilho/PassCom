@@ -11,7 +11,7 @@ import (
 const (
 	port      = ":9999"
 	CONN_PORT = "8888"
-	CONN_HOST = "app"
+	CONN_HOST = "localhost"
 	CONN_TYPE = "tcp"
 )
 
@@ -21,10 +21,8 @@ func main() {
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/user", handleGetUser)
-	http.HandleFunc("/route", handleGetRoute)
+	http.HandleFunc("/route", handleGetRoute) //!
 	http.HandleFunc("/flights", handleGetFlights)
-	http.HandleFunc("/reservation", handleReservation)
-	http.HandleFunc("/cart", handleGetCart)
 	http.HandleFunc("/ticket", handleTicket)
 	http.HandleFunc("/tickets", handleGetTickets)
 	log.Fatal(http.ListenAndServe(port, nil))
@@ -172,85 +170,6 @@ func handleGetCart(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// handleReservation is an HTTP handler function that handles requests for making and canceling reservations.
-// It checks the HTTP method of the request and calls the appropriate handler function based on the method.
-// If the method is neither POST nor DELETE, it returns a 405 Method Not Allowed status with an error message.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleReservation(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	switch r.Method {
-	case http.MethodPost:
-		handleMakeReservations(w, r)
-	case http.MethodDelete:
-		handleCancelReservation(w, r)
-	default:
-		http.Error(w, "only POST or DELETE allowed", http.StatusMethodNotAllowed)
-		return
-	}
-}
-
-// handleMakeReservations is an HTTP handler function that processes requests for making reservations.
-// It extracts the user's authorization token from the request headers and decodes the request body into a FlightsRequest struct.
-// If the decoding fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action, authorization token, and flight IDs,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleMakeReservations(w http.ResponseWriter, r *http.Request) {
-	// Extract the authorization token from the request headers
-	token := r.Header.Get("Authorization")
-
-	var flightIds models.FlightsRequest
-
-	err := json.NewDecoder(r.Body).Decode(&flightIds)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	request := models.Request{
-		Action: "reservation",
-		Auth:   token,
-		Data:   flightIds,
-	}
-
-	writeAndReturnResponse(w, request)
-}
-
-// handleCancelReservation is an HTTP handler function that processes requests for canceling reservations.
-// It extracts the user's authorization token from the request headers and decodes the request body into a CancelReservationRequest struct.
-// If the decoding fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action, authorization token, and reservation ID,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleCancelReservation(w http.ResponseWriter, r *http.Request) {
-
-	token := r.Header.Get("Authorization")
-
-	var reservationId models.CancelReservationRequest
-
-	err := json.NewDecoder(r.Body).Decode(&reservationId)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	writeAndReturnResponse(w, models.Request{
-		Action: "cancel-reservation",
-		Auth:   token,
-		Data:   reservationId,
-	})
-
-}
-
 // handleGetFlights is an HTTP handler function that retrieves flight information based on the provided flight IDs.
 // It checks the HTTP method of the request to ensure it's a POST request.
 // If the method is not POST, it returns a 405 Method Not Allowed status with an error message.
@@ -266,14 +185,13 @@ func handleGetFlights(w http.ResponseWriter, r *http.Request) {
 	allowCrossOrigin(w, r)
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	token := r.Header.Get("Authorization")
 
 	var flightIds models.FlightsRequest
-
 	err := json.NewDecoder(r.Body).Decode(&flightIds)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
