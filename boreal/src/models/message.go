@@ -1,0 +1,9 @@
+package models
+
+type Message struct {
+	Id          string         `json:"Id"`          // Serializado como string
+	From        string         `json:"From"`        // Serializado como string
+	To          string         `json:"To"`          // Serializado como string
+	VectorClock map[string]int `json:"VectorClock"` // Mapeia como string para evitar problemas
+	Request
+}
