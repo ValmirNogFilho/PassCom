@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"net"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,13 +19,14 @@ type System struct {
 	ServerId    uuid.UUID
 	Buffer      chan models.Message
 	VectorClock map[uuid.UUID]int
-	Connections map[uuid.UUID]net.Conn
+	Connections map[uuid.UUID]models.Connection
 	Lock        sync.Mutex
 	wg          sync.WaitGroup // WaitGroup para controlar goroutines
 	shutdown    chan os.Signal // Canal para sinalizar o encerramento
 }
 
 const (
+	ADDRESS     = "localhost"
 	PORT        = ":8080"
 	BUFFER_SIZE = 100
 	TIMEOUT     = 10 * time.Second
@@ -46,17 +47,11 @@ func GetInstance() *System {
 			ServerId:    uuid.New(),
 			Buffer:      make(chan models.Message, 100), // Exemplo de tamanho de buffer
 			VectorClock: make(map[uuid.UUID]int),
-			Connections: make(map[uuid.UUID]net.Conn),
+			Connections: make(map[uuid.UUID]models.Connection),
 			shutdown:    make(chan os.Signal, 1),
 		}
 	})
 	return instance
-}
-
-func (s *System) AddConnection(serverId uuid.UUID, conn net.Conn) {
-	s.Lock.Lock()
-	defer s.Lock.Unlock()
-	s.Connections[serverId] = conn
 }
 
 func (s *System) handleGetMessage(w http.ResponseWriter, r *http.Request) {
@@ -99,14 +94,24 @@ func (s *System) handleHTTPMessage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *System) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	ip := r.RemoteAddr
+
+	log.Printf("Heartbeat check successful from %s\n", ip)
+}
+
 func (s *System) IsReceivedClockNewer(clock map[uuid.UUID]int) int {
-	// Assume que VCx é o relógio do sistema e VCy é o relógio recebido.
-	// VCx < VCy ⇔ ∀z[VCx[z] ≤ VCy[z]] e ∃z[VCx[w] < VCy[w]]
-	// lê-se: VCx é mais antigo que VCy se, para todo z de VCx, eles são menores ou iguais
-	// para o correspondente z em VCy, e existe um w onde VCx[w] é estritamente menor que VCy[w].
-	// se a condição acima for atendida, então VCx é mais antigo que VCy.
-	// se a condição acima for atendida para VCy, então o relógio do sistema é mais novo que VCy.
-	// caso contrário, se ∃[VCx[z] > VCy[z]], então VCx e VCy são concorrentes.
+	// Assuma que VC(x) é o relógio do sistema e VC(y) é o relógio recebido.
+	// VC(x) < VC(y) ⇔ ∀z[VC(x)[z] ≤ VC(y)[z]] e ∃w[VC(x)[w] < VC(y)[w]]
+	// Lê-se: VC(x) é mais antigo que VC(y) se, para todo z de VC(x), eles são menores ou iguais
+	// para o correspondente z em VC(y), e existe um w onde VC(x)[w] é estritamente menor que VC(y)[w].
+	// Se a condição acima for atendida, então VC(y) é mais novo que VC(x).
+	// Se a condição acima for atendida para VC(y), então VC(y) é mais antigo que VC(x).
+	// Senão, se ∃z'[VC(x)[z'] > VC(y)[z']], então VC(x) e VC(y) são concorrentes.
+	// Senão, VC(x) e VC(y) são iguais.
 
 	vx := s.VectorClock
 	vy := clock
@@ -157,7 +162,7 @@ func (s *System) IsReceivedClockNewer(clock map[uuid.UUID]int) int {
 
 func (s *System) updateVectorClock(receivedClock map[uuid.UUID]int) {
 	for id, time := range receivedClock {
-		if time > s.VectorClock[id] {
+		if _, exists := s.VectorClock[id]; !exists || time > s.VectorClock[id] {
 			s.VectorClock[id] = time
 		}
 	}
@@ -166,14 +171,16 @@ func (s *System) updateVectorClock(receivedClock map[uuid.UUID]int) {
 func (s *System) StartServer() error {
 	signal.Notify(s.shutdown, syscall.SIGINT, syscall.SIGTERM)
 
+	http.HandleFunc("/heartbeat", s.handleHeartbeat)
 	http.HandleFunc("/messages", s.handleHTTPMessage)
 
-	fmt.Println("HTTP Server listening on", PORT)
 	server := &http.Server{
-		Addr:         PORT,
+		Addr:         ADDRESS + PORT,
 		ReadTimeout:  TIMEOUT,
 		WriteTimeout: TIMEOUT,
 	}
+
+	log.Println("HTTP Server listening on", server.Addr)
 
 	errCh := make(chan error, 1)
 	go func() {
@@ -184,10 +191,11 @@ func (s *System) StartServer() error {
 
 	select {
 	case <-s.shutdown:
-		fmt.Println("Server shutting down...")
+		log.Println("Server shutting down...")
 		s.wg.Wait()
 		return server.Close()
 	case err := <-errCh:
-		return fmt.Errorf("server error: %v", err)
+		log.Fatalf("server error: %v", err)
+		return err
 	}
 }

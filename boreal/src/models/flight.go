@@ -19,6 +19,7 @@ type FlightJSON struct {
 
 type Flight struct {
 	Id              uuid.UUID
+	From            uuid.UUID // De qual servidor é esse voo
 	SourceAirportId uuid.UUID
 	DestAirportId   uuid.UUID
 	Passengers      []*Ticket
