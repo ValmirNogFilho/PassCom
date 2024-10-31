@@ -73,26 +73,26 @@ func CleanupSessions(timeout time.Duration) {
 //   - request: A models.Request struct containing the incoming request data.
 //   - conn: A net.Conn object representing the client connection.
 func handleRequest(request models.Request, conn net.Conn) {
-	switch request.Action {
-	case "login":
-		login(request.Data, conn)
-	case "get-user":
-		getUserBySessionToken(request.Auth, conn)
-	case "logout":
-		logout(request.Auth, conn)
-	case "all-routes":
-		AllRoutes(request.Auth, conn)
+	// switch request.Action {
+	// case "login":
+	// 	Login(request.Data)
+	// case "get-user":
+	// 	GetUserBySessionToken(request)
+	// case "logout":
+	// 	Logout(request)
+	// case "all-routes":
+	// 	AllRoutes(request.Auth, conn)
 	// case "route":
 	// 	Route(request.Auth, request.Data, conn)
-	case "flights":
-		Flights(request.Auth, request.Data, conn)
-	case "buy":
-		BuyTicket(request.Auth, request.Data, conn)
-	case "cancel-buy":
-		CancelBuy(request.Auth, request.Data, conn)
-	case "tickets":
-		GetTickets(request.Auth, conn)
-	}
+	// case "flights":
+	// 	Flights(request)
+	// case "buy":
+	// 	BuyTicket(request.Auth, request.Data, conn)
+	// case "cancel-buy":
+	// 	CancelBuy(request.Auth, request.Data, conn)
+	// case "tickets":
+	// 	GetTickets(request.Auth, conn)
+	// }
 }
 
 // WriteNewResponse sends a response to the client over the provided net.Conn connection.

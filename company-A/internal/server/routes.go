@@ -110,33 +110,31 @@ func AllRoutes(auth string, conn net.Conn) {
 //   - The response contains flight details if authorized and valid flight IDs are provided.
 //   - If not authorized, it returns an error response with the message "not authorized".
 //   - If any of the provided flight IDs does not exist, it returns an error response.
-func Flights(auth string, data interface{}, conn net.Conn) {
-	_, exists := SessionIfExists(auth)
-	fmt.Print("oiii")
+func Flights(request models.Request) models.Response {
+	_, exists := SessionIfExists(request.Auth)
 	if !exists {
-		WriteNewResponse(models.Response{
+		return models.Response{
 			Error: "not authorized",
-		}, conn)
-		return
+		}
 	}
 
 	var flightsRequest models.FlightsRequest
 
-	jsonData, _ := json.Marshal(data)
+	jsonData, _ := json.Marshal(request.Data)
 	json.Unmarshal(jsonData, &flightsRequest)
 
 	responseData, err := getRoute(flightsRequest.FlightIds)
 	if err != nil {
-		WriteNewResponse(models.Response{
+		return models.Response{
 			Error: err.Error(),
-		}, conn)
+		}
 	}
 
-	WriteNewResponse(models.Response{
+	return models.Response{
 		Data: map[string]interface{}{
 			"Flights": responseData,
 		},
-	}, conn)
+	}
 }
 
 // getRoute retrieves flight details for a given list of flight IDs.

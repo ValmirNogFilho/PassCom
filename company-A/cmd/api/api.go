@@ -2,22 +2,26 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
-	"net"
 	"net/http"
+	"time"
 	"vendepass/internal/models"
+	"vendepass/internal/server"
 )
 
 const (
 	port      = ":9999"
-	CONN_PORT = "8888"
-	CONN_HOST = "localhost"
-	CONN_TYPE = "tcp"
+	timeLimit = 30 * time.Minute
 )
 
 // main initializes and starts the HTTP server for the application.
 // It sets up the routes for various API endpoints and listens on the specified port.
 func main() {
+	fmt.Println("servidor ouvindo na porta", port)
+
+	go server.CleanupSessions(timeLimit)
+
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/user", handleGetUser)
@@ -63,11 +67,13 @@ func handleGetTickets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.Header.Get("Authorization")
+	response := server.GetTickets(
+		models.Request{
+			Auth: token,
+		},
+	)
 
-	writeAndReturnResponse(w, models.Request{
-		Action: "tickets",
-		Auth:   token,
-	})
+	returnResponse(w, r, response)
 }
 
 // handleTicket is a HTTP handler function that handles requests for buying and canceling tickets.
@@ -109,11 +115,13 @@ func handleBuyTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeAndReturnResponse(w, models.Request{
-		Action: "buy",
-		Auth:   token,
-		Data:   buyTicket,
+	response := server.BuyTicket(models.Request{
+		Auth: token,
+		Data: buyTicket,
 	})
+
+	returnResponse(w, r, response)
+
 }
 
 // handleCancelTicket is a HTTP handler function that handles requests for canceling tickets.
@@ -137,37 +145,11 @@ func handleCancelTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeAndReturnResponse(w, models.Request{
-		Action: "cancel-buy",
-		Auth:   token,
-		Data:   ticketId,
+	response := server.CancelBuy(models.Request{
+		Auth: token,
+		Data: ticketId,
 	})
-}
-
-// handleGetCart is an HTTP handler function that retrieves the user's shopping cart.
-// It checks the HTTP method of the request to ensure it's a GET request.
-// If the method is not GET, it returns a 405 Method Not Allowed status with an error message.
-// It extracts the user's authorization token from the request headers and constructs a Request object
-// with the appropriate action and authorization token.
-// The constructed Request object is then sent to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleGetCart(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-
-	writeAndReturnResponse(w, models.Request{
-		Action: "cart",
-		Auth:   token,
-	})
+	returnResponse(w, r, response)
 }
 
 // handleGetFlights is an HTTP handler function that retrieves flight information based on the provided flight IDs.
@@ -198,11 +180,12 @@ func handleGetFlights(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeAndReturnResponse(w, models.Request{
-		Action: "flights",
-		Auth:   token,
-		Data:   flightIds,
+	response := server.Flights(models.Request{
+		Auth: token,
+		Data: flightIds,
 	})
+
+	returnResponse(w, r, response)
 }
 
 // handleGetRoute is an HTTP handler function that retrieves route information based on the provided source and destination.
@@ -221,20 +204,20 @@ func handleGetRoute(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	queryParams := r.URL.Query()
+	// queryParams := r.URL.Query()
 
-	src := queryParams.Get("src")
-	dest := queryParams.Get("dest")
+	// src := queryParams.Get("src")
+	// dest := queryParams.Get("dest")
 
-	token := r.Header.Get("Authorization")
-	writeAndReturnResponse(w, models.Request{
-		Action: "route",
-		Auth:   token,
-		Data: models.RouteRequest{
-			Source: src,
-			Dest:   dest,
-		},
-	})
+	// token := r.Header.Get("Authorization")
+	// writeAndReturnResponse(w, models.Request{
+	// 	Action: "route",
+	// 	Auth:   token,
+	// 	Data: models.RouteRequest{
+	// 		Source: src,
+	// 		Dest:   dest,
+	// 	},
+	// })
 }
 
 // handleGetUser is an HTTP handler function that retrieves user information.
@@ -256,7 +239,10 @@ func handleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get("Authorization")
 
-	writeAndReturnResponse(w, models.Request{Action: "get-user", Auth: token})
+	response := server.GetUserBySessionToken(models.Request{Auth: token})
+
+	returnResponse(w, r, response)
+
 }
 
 // handleLogout handles HTTP GET requests to log out the authenticated user.
@@ -275,8 +261,10 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.Header.Get("Authorization")
+	req := models.Request{Auth: token}
+	response := server.Logout(req)
 
-	writeAndReturnResponse(w, models.Request{Action: "logout", Auth: token})
+	returnResponse(w, r, response)
 }
 
 // handleLogin handles HTTP POST requests to log in the authenticated user.
@@ -303,48 +291,15 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeAndReturnResponse(w, models.Request{
-		Action: "login",
-		Data:   logCred,
-	})
+	responseData := server.Login(logCred)
+
+	returnResponse(w, r, responseData)
+
 }
 
-// writeAndReturnResponse is a function that establishes a connection to the server,
-// sends a request to the server, receives the server's response, and writes the response to the HTTP response writer.
-//
-// Parameters:
-// - w: http.ResponseWriter to write the HTTP response.
-// - req: models.Request representing the request to be sent to the server.
-func writeAndReturnResponse(w http.ResponseWriter, req models.Request) {
-	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer conn.Close()
-
-	buffer, _ := json.Marshal(req)
-	_, writeErr := conn.Write(buffer)
-	if writeErr != nil {
-		http.Error(w, writeErr.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	receive := make([]byte, 2048)
-	n, readErr := conn.Read(receive)
-	if readErr != nil {
-		http.Error(w, readErr.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var responseData models.Response
-	err = json.Unmarshal(receive[:n], &responseData)
-	if err != nil {
-		http.Error(w, "Failed to decode response from server", http.StatusInternalServerError)
-		return
-	}
-
+func returnResponse(w http.ResponseWriter, r *http.Request, responseData models.Response) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(responseData)
+
 }

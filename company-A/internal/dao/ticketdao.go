@@ -96,7 +96,7 @@ func (dao *DBTicketDAO) FindById(id uint) (*models.Ticket, error) {
 	defer utils.CloseDb(db)
 
 	var ticket models.Ticket
-	if err := db.Take(&ticket, "id = ?", id).Error; err != nil {
+	if err := db.Preload("Flight").Take(&ticket, "id = ?", id).Error; err != nil {
 		log.Println("Error searching ticket:", err)
 		return nil, err
 	}

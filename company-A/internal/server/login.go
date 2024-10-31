@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"net"
 	"time"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
@@ -31,7 +30,7 @@ func passwordMatches(client *models.Client, password string) bool {
 // If the client is already logged in, it sends an error response to the client and returns.
 // If the client is not logged in, it creates a new session for the client, stores it in the database, and sends a success response with the session token to the client.
 // If the passwords do not match, it sends an error response to the client.
-func login(data interface{}, conn net.Conn) {
+func Login(data interface{}) models.Response {
 	var logCred models.LoginCredentials
 
 	response := models.Response{Data: make(map[string]interface{})}
@@ -43,11 +42,9 @@ func login(data interface{}, conn net.Conn) {
 
 	fmt.Println(login)
 	if err != nil {
-		WriteNewResponse(
-			models.Response{
-				Error: err.Error(),
-			}, conn)
-		return
+		return models.Response{
+			Error: err.Error(),
+		}
 	}
 
 	var session *models.Session
@@ -55,11 +52,10 @@ func login(data interface{}, conn net.Conn) {
 	if passwordMatches(login, logCred.Password) {
 
 		if s := findUser(login); s != nil {
-			WriteNewResponse(
-				models.Response{
-					Error: "more than one user logged",
-				}, conn)
-			return
+			return models.Response{
+				Error: "more than one user logged",
+			}
+
 		} else {
 			session = &models.Session{ClientID: login.ID, LastTimeActive: time.Now()}
 			dao.GetSessionDAO().Insert(session)
@@ -72,7 +68,7 @@ func login(data interface{}, conn net.Conn) {
 	} else {
 		response.Error = "invalid credentials"
 	}
-	WriteNewResponse(response, conn)
+	return response
 }
 
 // findUser searches for an active session associated with a given client.
@@ -106,22 +102,20 @@ func findUser(login *models.Client) *models.Session {
 //
 // Return:
 // - None. The function writes the response directly to the connection.
-func logout(auth string, conn net.Conn) {
-	defer conn.Close()
+func Logout(req models.Request) models.Response {
 	response := models.Response{Data: make(map[string]interface{})}
 
-	session, exists := SessionIfExists(auth)
+	session, exists := SessionIfExists(req.Auth)
 
 	if !exists {
 		response.Error = "session not found"
-		WriteNewResponse(response, conn)
-		return
+		return response
 	}
 
 	dao.GetSessionDAO().Delete(session)
 
 	response.Data["msg"] = "logout successfully made"
-	WriteNewResponse(response, conn)
+	return response
 }
 
 // getUserBySessionToken retrieves the user associated with a given session token.
@@ -136,16 +130,14 @@ func logout(auth string, conn net.Conn) {
 //
 // Return:
 // - None. The function writes the response directly to the connection.
-func getUserBySessionToken(auth string, conn net.Conn) {
-	defer conn.Close()
+func GetUserBySessionToken(request models.Request) models.Response {
 	response := models.Response{Data: make(map[string]interface{})}
 
-	session, exists := SessionIfExists(auth)
+	session, exists := SessionIfExists(request.Auth)
 
 	if !exists {
 		response.Error = "session not found"
-		WriteNewResponse(response, conn)
-		return
+		return response
 	}
 
 	id := session.ClientID
@@ -161,5 +153,5 @@ func getUserBySessionToken(auth string, conn net.Conn) {
 		"ClientFlights": client.ClientFlights,
 		"Username":      client.Username,
 	}
-	WriteNewResponse(response, conn)
+	return response
 }

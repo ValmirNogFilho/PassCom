@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"net"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
 )
@@ -16,14 +15,13 @@ import (
 //
 // Return:
 //   - No return value.
-func GetTickets(auth string, conn net.Conn) {
-	session, exists := SessionIfExists(auth)
+func GetTickets(request models.Request) models.Response {
+	session, exists := SessionIfExists(request.Auth)
 
 	if !exists {
-		WriteNewResponse(models.Response{
+		return models.Response{
 			Error: "not authorized",
-		}, conn)
-		return
+		}
 	}
 	responseData := make([]map[string]interface{}, 0)
 
@@ -33,18 +31,18 @@ func GetTickets(auth string, conn net.Conn) {
 		flight := ticket.Flight
 
 		flightresponse := make(map[string]interface{})
-
 		flightresponse["Src"] = flight.OriginAirport.City
 		flightresponse["Dest"] = flight.DestinationAirport.City
 		flightresponse["Id"] = ticket.ID
+		flightresponse["Seats"] = flight.Seats
 		responseData = append(responseData, flightresponse)
 	}
 
-	WriteNewResponse(models.Response{
+	return models.Response{
 		Data: map[string]interface{}{
 			"Tickets": responseData,
 		},
-	}, conn)
+	}
 }
 
 // BuyTicket handles the process of purchasing a ticket for an authenticated client.
@@ -58,33 +56,44 @@ func GetTickets(auth string, conn net.Conn) {
 //
 // Return:
 //   - No return value.
-func BuyTicket(auth string, data interface{}, conn net.Conn) {
-	session, exists := SessionIfExists(auth)
+func BuyTicket(request models.Request) models.Response {
+	session, exists := SessionIfExists(request.Auth)
 
 	if !exists {
-		WriteNewResponse(models.Response{
+
+		return models.Response{
 			Error: "not authorized",
-		}, conn)
-		return
+		}
 	}
 
 	var buyTicket models.BuyTicket
 
-	jsonData, _ := json.Marshal(data)
+	jsonData, _ := json.Marshal(request.Data)
 	json.Unmarshal(jsonData, &buyTicket)
 
-	ticket := models.Ticket{
-		ClientId: session.ClientID,
-		FlightId: buyTicket.FlightId,
+	flight, _ := dao.GetFlightDAO().FindById(buyTicket.FlightId)
+
+	if flight.Seats > 0 {
+		ticket := models.Ticket{
+			ClientId: session.ClientID,
+			FlightId: buyTicket.FlightId,
+		}
+
+		flight.Seats--
+		dao.GetFlightDAO().Update(*flight)
+		dao.GetTicketDAO().Insert(ticket)
+		return models.Response{
+			Data: map[string]interface{}{
+				"msg": "success",
+			},
+		}
+	}
+	return models.Response{
+		Data: map[string]interface{}{
+			"Error": "not available seats",
+		},
 	}
 
-	dao.GetTicketDAO().Insert(ticket)
-
-	WriteNewResponse(models.Response{
-		Data: map[string]interface{}{
-			"msg": "success",
-		},
-	}, conn)
 }
 
 // CancelBuy handles the cancellation of a ticket for an authenticated client.
@@ -98,28 +107,27 @@ func BuyTicket(auth string, data interface{}, conn net.Conn) {
 //
 // Return:
 //   - No return value.
-func CancelBuy(auth string, data interface{}, conn net.Conn) {
-	_, exists := SessionIfExists(auth)
+func CancelBuy(request models.Request) models.Response {
+	_, exists := SessionIfExists(request.Auth)
 
 	if !exists {
-		WriteNewResponse(models.Response{
+		return models.Response{
 			Error: "not authorized",
-		}, conn)
-		return
+		}
+
 	}
 
 	var cancelBuy models.CancelBuyRequest
 
-	jsonData, _ := json.Marshal(data)
+	jsonData, _ := json.Marshal(request.Data)
 	json.Unmarshal(jsonData, &cancelBuy)
 
 	ticket, err := dao.GetTicketDAO().FindById(cancelBuy.TicketId)
 
 	if err != nil {
-		WriteNewResponse(models.Response{
+		return models.Response{
 			Error: "ticket not found",
-		}, conn)
-		return
+		}
 	}
 
 	flight := ticket.Flight
@@ -128,9 +136,9 @@ func CancelBuy(auth string, data interface{}, conn net.Conn) {
 	dao.GetFlightDAO().Update(flight)
 	dao.GetTicketDAO().Delete(*ticket)
 
-	WriteNewResponse(models.Response{
+	return models.Response{
 		Data: map[string]interface{}{
 			"msg": "success",
 		},
-	}, conn)
+	}
 }
