@@ -45,7 +45,7 @@ func GetInstance() *System {
 	once.Do(func() {
 		instance = &System{
 			ServerId:    uuid.New(),
-			Buffer:      make(chan models.Message, 100), // Exemplo de tamanho de buffer
+			Buffer:      make(chan models.Message, BUFFER_SIZE),
 			VectorClock: make(map[uuid.UUID]int),
 			Connections: make(map[uuid.UUID]models.Connection),
 			shutdown:    make(chan os.Signal, 1),
@@ -54,9 +54,8 @@ func GetInstance() *System {
 	return instance
 }
 
+// TODO: Verificar se a mensagem foi redirecionada para evitar loops
 func (s *System) handleGetMessage(w http.ResponseWriter, r *http.Request) {
-	// TODO: Verificar se a mensagem foi redirecionada para evitar o loop
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(map[string]string{"status": "Message received"}); err != nil {
