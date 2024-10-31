@@ -7,4 +7,5 @@ import (
 type Connection struct {
 	Request  *http.Request
 	Response http.ResponseWriter
+	IsOnline bool
 }
