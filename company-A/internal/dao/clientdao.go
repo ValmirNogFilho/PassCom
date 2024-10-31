@@ -133,8 +133,10 @@ func (dao *DBClientDAO) FindById(id uint) (*models.Client, error) {
 
 	var client models.Client
 	if err := db.
+		Preload("ClientFlights").
 		Preload("ClientFlights.Flight").
-		Preload("ClientFlights").Take(&client, "id = ?", id).Error; err != nil {
+		Preload("ClientFlights.Flight.OriginAirport").
+		Preload("ClientFlights.Flight.DestinationAirport").Take(&client, "id = ?", id).Error; err != nil {
 		log.Println("Error searching client:", err)
 		return nil, err
 	}
