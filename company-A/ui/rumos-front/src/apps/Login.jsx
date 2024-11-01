@@ -3,8 +3,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../axios";
-// import username from "../assets/username.svg";
-// import password from "../assets/password.svg";
+import "../components/login.css"
+import logo from "../assets/logo.png"
+import username from "../assets/username.svg";
+import password from "../assets/password.svg";
 
 const Login = () => {
     const {
@@ -43,9 +45,9 @@ const Login = () => {
 
 
             <form onSubmit={handleSubmit(onSubmit)} className="login-container">
-                {/* <img src={logo} alt="" /> */}
+                <img src={logo} alt="" />
                 <div className="username-group">
-                    {/* <img src={username} alt="" width={"17px"} /> */}
+                    <img src={username} alt="" width={"30px"} />
                     <input
                         className="login-input"
                         type="text"
@@ -56,7 +58,7 @@ const Login = () => {
                     {errors.username && <h5 className="advice">Insira o username.</h5>}
 
                 <div className="password-group">
-                    {/* <img src={password} alt="" width={"17px"}/> */}
+                    <img src={password} alt="" width={"30px"}/>
                     <input
                         className="login-input"
                         type="password"

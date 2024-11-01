@@ -3,11 +3,11 @@ import BrazilMap from '../components/BrazilMap'
 import SelectBoxes from '../components/SelectBoxes'
 import Header from '../components/Header'
 import { apiService } from '../axios'
-import { useNavigate } from 'react-router-dom'
+import Container from '../components/Container'
+import Footer from '../components/Footer'
 
 const Home = () => {
   const [airports, setAirports] = useState([])
-  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCapitals = async () => {
@@ -30,12 +30,15 @@ const Home = () => {
       </div>
       <div className="content">
 
-
         <div className="map">
           <BrazilMap capitals={airports} />
         </div>
-        <SelectBoxes airports={airports} />
+        <div className="search">
+          <SelectBoxes airports={airports} />
+          <Container />
+        </div>
       </div>
+      <Footer />
     </div>
   )
 }

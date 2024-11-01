@@ -11,10 +11,14 @@
     font-family: "Commissioner", sans-serif;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 860px) {
     .map {
         width: 100%;
         aspect-ratio: 1;
+    }
+    header .logo {
+        height: 3rem;
+        width: auto;
     }
     .content {
         display: flex;
@@ -22,13 +26,15 @@
         justify-content: center;
         align-items: center;
         padding: 0 5rem;
+        width: 100%;
+        height: 100%;
     }
     .select-boxes {
         margin-top: 3rem;
     }
 }
 
-@media (min-width: 768px){
+@media (min-width: 861px){
     .map {
         width: 450px;
         height: 450px;
@@ -37,21 +43,25 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
-        padding: 0 2rem;
+        padding: 0 4rem;
     }
 
     .select-boxes {
-        place-self: center;
+        place-self: top;
+        display: flex;    
     }
+}
+
+body {
+    height: 100vh;
 }
 
 .home {
     background-color: var(--bg);
-    height: 100vh;
 }
 
 .title {
-    padding-top: 7rem;
+    padding-bottom: 1rem;
     text-align: center;
 }
 

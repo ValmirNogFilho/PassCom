@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"net/http"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
 )
@@ -20,7 +21,8 @@ func GetTickets(request models.Request) models.Response {
 
 	if !exists {
 		return models.Response{
-			Error: "not authorized",
+			Error:  "not authorized",
+			Status: http.StatusUnauthorized,
 		}
 	}
 	responseData := make([]map[string]interface{}, 0)
@@ -42,6 +44,7 @@ func GetTickets(request models.Request) models.Response {
 		Data: map[string]interface{}{
 			"Tickets": responseData,
 		},
+		Status: http.StatusOK,
 	}
 }
 
