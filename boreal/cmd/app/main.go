@@ -1,8 +1,8 @@
 package main
 
 import (
+	"boreal/src/server"
 	"log"
-	"passcom/boreal/src/server"
 )
 
 func main() {

@@ -2,7 +2,7 @@
 package interfaces
 
 import (
-	"passcom/boreal/src/models"
+	"boreal/src/models"
 
 	"github.com/google/uuid"
 )

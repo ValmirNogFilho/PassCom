@@ -1,8 +1,8 @@
 package data
 
 import (
+	"boreal/src/models"
 	"errors"
-	"passcom/boreal/src/models"
 	"sync"
 
 	"github.com/google/uuid"

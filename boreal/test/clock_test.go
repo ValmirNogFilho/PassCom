@@ -1,7 +1,7 @@
 package test
 
 import (
-	"passcom/boreal/src/server"
+	"boreal/src/server"
 	"testing"
 
 	"github.com/google/uuid"
@@ -25,7 +25,7 @@ func TestEqual(t *testing.T) {
 		TestClock[id] = i
 	}
 
-	result := system.IsReceivedClockNewer(TestClock)
+	result := system.CompareClock(system.VectorClock, TestClock)
 	if result != server.EQUAL {
 		t.Errorf("Expected %d, got %d", server.EQUAL, result)
 	}
@@ -41,7 +41,7 @@ func TestNewer(t *testing.T) {
 		TestClock[id] = i + 1
 	}
 
-	result := system.IsReceivedClockNewer(TestClock)
+	result := system.CompareClock(system.VectorClock, TestClock)
 	if result != server.NEWER {
 		t.Errorf("Expected %d, got %d", server.NEWER, result)
 	}
@@ -57,7 +57,7 @@ func TestOlder(t *testing.T) {
 		TestClock[id] = i
 	}
 
-	result := system.IsReceivedClockNewer(TestClock)
+	result := system.CompareClock(system.VectorClock, TestClock)
 	if result != server.OLDER {
 		t.Errorf("Expected %d, got %d", server.OLDER, result)
 	}
@@ -78,9 +78,8 @@ func TestConcurrent(t *testing.T) {
 		}
 	}
 
-	result := system.IsReceivedClockNewer(TestClock)
+	result := system.CompareClock(system.VectorClock, TestClock)
 	if result != server.CONCURRENT {
 		t.Errorf("Expected %d, got %d", server.CONCURRENT, result)
 	}
 }
-

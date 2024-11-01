@@ -1,8 +1,8 @@
 package data
 
 import (
-	"passcom/boreal/src/data/interfaces"
-	"passcom/boreal/src/models"
+	"boreal/src/data/interfaces"
+	"boreal/src/models"
 	"sync"
 
 	"github.com/google/uuid"
