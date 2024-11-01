@@ -79,7 +79,7 @@ func (dao *DBFlightDAO) Delete(a models.Flight) error {
 	}
 	defer utils.CloseDb(db)
 
-	if err := db.Delete(&models.Airport{}, "id = ?", a.ID).Error; err != nil {
+	if err := db.Delete(&models.Flight{}, "id = ?", a.ID).Error; err != nil {
 		log.Println("Error deleting Flight:", err)
 		return err
 	}

@@ -58,3 +58,13 @@ type TicketDAO interface {
 	FindById(uint) (*models.Ticket, error)
 	New()
 }
+
+type MessageDAO interface {
+	FindAll() []models.Message
+	Insert(models.Message)
+	Update(models.Message) error
+	Delete(models.Message)
+	FindById(uint) (*models.Message, error)
+	New()
+	FindByName(name string) *models.Message
+}

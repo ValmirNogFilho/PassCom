@@ -1,6 +1,6 @@
 package models
 
 type Request struct {
-	Auth string      `json:"Auth"` // Modifique para aceitar nulos
+	Auth string      `json:"Auth"`
 	Data interface{} `json:"Data"`
 }
