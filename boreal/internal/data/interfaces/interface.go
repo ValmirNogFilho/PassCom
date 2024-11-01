@@ -2,7 +2,7 @@
 package interfaces
 
 import (
-	"boreal/src/models"
+	"boreal/internal/models"
 
 	"github.com/google/uuid"
 )

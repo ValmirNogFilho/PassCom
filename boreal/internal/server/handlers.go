@@ -1,12 +1,23 @@
 package server
 
 import (
-	"boreal/src/models"
+	"boreal/internal/models"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 )
+
+func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+}
 
 // TODO: Verificar se a mensagem foi redirecionada para evitar loops
 func (s *System) handleGetMessage(w http.ResponseWriter, r *http.Request) {

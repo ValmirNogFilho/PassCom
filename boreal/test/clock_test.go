@@ -1,7 +1,7 @@
 package test
 
 import (
-	"boreal/src/server"
+	"boreal/internal/server"
 	"testing"
 
 	"github.com/google/uuid"

@@ -1,8 +1,8 @@
 package data
 
 import (
-	"boreal/src/data/interfaces"
-	"boreal/src/models"
+	"boreal/internal/data/interfaces"
+	"boreal/internal/models"
 	"sync"
 
 	"github.com/google/uuid"

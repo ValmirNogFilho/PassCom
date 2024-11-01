@@ -1,7 +1,7 @@
 package main
 
 import (
-	"boreal/src/server"
+	"boreal/internal/server"
 	"log"
 )
 

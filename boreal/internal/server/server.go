@@ -1,7 +1,7 @@
 package server
 
 import (
-	"boreal/src/models"
+	"boreal/internal/models"
 	"log"
 	"net/http"
 	"os"

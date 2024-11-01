@@ -1,7 +1,7 @@
 package data
 
 import (
-	"boreal/src/models"
+	"boreal/internal/models"
 	"errors"
 	"sync"
 

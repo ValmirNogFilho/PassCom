@@ -1,7 +1,7 @@
 package data
 
 import (
-	"boreal/src/models"
+	"boreal/internal/models"
 	"encoding/json"
 	"errors"
 	"log"
@@ -30,7 +30,7 @@ func (dao *MemoryFlightDAO) New() {
 		log.Fatal(err)
 	}
 
-	jsonPath := filepath.Join(baseDir, "src", "assets", "airports.json")
+	jsonPath := filepath.Join(baseDir, "internal", "assets", "airports.json")
 
 	b, _ := os.ReadFile(jsonPath)
 
