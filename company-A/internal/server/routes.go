@@ -4,9 +4,38 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
 )
+
+func GetAirports(request models.Request) models.Response {
+	_, exists := SessionIfExists(request.Auth)
+
+	if !exists {
+		return models.Response{
+			Error: "not authorized",
+		}
+	}
+	responseData := make([]map[string]interface{}, 0)
+
+	airports := dao.GetAirportDAO().FindAll()
+
+	for _, airport := range airports {
+
+		airportresponse := make(map[string]interface{})
+		airportresponse["Name"] = airport.Name
+		airportresponse["City"] = airport.City
+		responseData = append(responseData, airportresponse)
+	}
+
+	return models.Response{
+		Data: map[string]interface{}{
+			"Airports": responseData,
+		},
+		Status: http.StatusOK,
+	}
+}
 
 // AllRoutes handles the retrieval of all available routes.
 // It checks if the provided authentication token is valid and returns a list of all routes if authorized.

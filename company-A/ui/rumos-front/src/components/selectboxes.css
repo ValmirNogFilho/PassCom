@@ -1,0 +1,42 @@
+.select-boxes {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+}
+
+.select-boxes select {
+    height: 3rem;
+    border: none;
+    border-radius: 10px;
+    padding: 1rem;
+    color: black;
+    font-weight: 600;
+}
+
+.select-boxes button, .select-boxes select{
+    background-color: var(--grey);
+}
+
+@keyframes rotate360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.select-boxes button {
+    border-radius: 50%;
+    width: 50px;
+    aspect-ratio: 1;
+    border: none;
+    color: #222121;
+    align-self: center;
+    padding: 5px;
+}
+
+.spin-animation {
+    animation: rotate360 .9s ease-in-out;
+}

@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
@@ -40,10 +41,10 @@ func Login(data interface{}) models.Response {
 
 	login, err := dao.GetClientDAO().FindByUsername(logCred.Username)
 
-	fmt.Println(login)
 	if err != nil {
 		return models.Response{
-			Error: err.Error(),
+			Error:  "client not found",
+			Status: http.StatusUnauthorized,
 		}
 	}
 
@@ -53,7 +54,8 @@ func Login(data interface{}) models.Response {
 
 		if s := findUser(login); s != nil {
 			return models.Response{
-				Error: "more than one user logged",
+				Error:  "more than one user logged",
+				Status: http.StatusUnauthorized,
 			}
 
 		} else {
@@ -64,9 +66,11 @@ func Login(data interface{}) models.Response {
 		token := fmt.Sprintf("%s", session.ID)
 
 		response.Data["token"] = token
+		response.Status = http.StatusOK
 
 	} else {
 		response.Error = "invalid credentials"
+		response.Status = http.StatusUnauthorized
 	}
 	return response
 }
@@ -109,12 +113,14 @@ func Logout(req models.Request) models.Response {
 
 	if !exists {
 		response.Error = "session not found"
+		response.Status = http.StatusNotFound
 		return response
 	}
 
 	dao.GetSessionDAO().Delete(session)
 
 	response.Data["msg"] = "logout successfully made"
+	response.Status = http.StatusOK
 	return response
 }
 

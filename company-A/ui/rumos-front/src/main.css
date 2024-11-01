@@ -1,0 +1,66 @@
+:root {
+    --theme: #bd0000;
+    --bg: #e5e7eb;
+    --grey: #d4d4d8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Commissioner", sans-serif;
+}
+
+@media (max-width: 767px) {
+    .map {
+        width: 100%;
+        aspect-ratio: 1;
+    }
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5rem;
+    }
+    .select-boxes {
+        margin-top: 3rem;
+    }
+}
+
+@media (min-width: 768px){
+    .map {
+        width: 450px;
+        height: 450px;
+    }
+    .content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 0 2rem;
+    }
+
+    .select-boxes {
+        place-self: center;
+    }
+}
+
+.home {
+    background-color: var(--bg);
+    height: 100vh;
+}
+
+.title {
+    padding-top: 7rem;
+    text-align: center;
+}
+
+.title h1 {
+    font-weight: 600;
+    margin: 1rem;
+}
+
+.title h3 {
+    font-weight: 300;
+    margin: 1rem;
+}

@@ -29,6 +29,7 @@ func main() {
 	http.HandleFunc("/flights", handleGetFlights)
 	http.HandleFunc("/ticket", handleTicket)
 	http.HandleFunc("/tickets", handleGetTickets)
+	http.HandleFunc("/airports", handleGetAirports)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
 
@@ -48,6 +49,24 @@ func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+}
+
+func handleGetAirports(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := r.Header.Get("Authorization")
+	response := server.GetAirports(
+		models.Request{
+			Auth: token,
+		},
+	)
+
+	returnResponse(w, r, response)
 }
 
 // handleGetTickets handles HTTP GET requests to retrieve a list of tickets for the authenticated user.
@@ -292,14 +311,13 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseData := server.Login(logCred)
-
 	returnResponse(w, r, responseData)
 
 }
 
 func returnResponse(w http.ResponseWriter, r *http.Request, responseData models.Response) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(responseData.Status)
 	json.NewEncoder(w).Encode(responseData)
 
 }
