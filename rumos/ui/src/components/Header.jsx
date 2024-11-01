@@ -1,6 +1,6 @@
 import React from 'react'
 import "./header.css"
-import logo from "../assets/logo.png"
+import logo from "../assets/logo-white.svg"
 import { apiService } from '../axios'
 import { useNavigate } from 'react-router-dom'
 const Header = () => {

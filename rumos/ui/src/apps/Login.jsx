@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "../axios";
 import "../components/login.css"
-import logo from "../assets/logo.png"
+import logo from "../assets/logo.svg"
 import username from "../assets/username.svg";
 import password from "../assets/password.svg";
 

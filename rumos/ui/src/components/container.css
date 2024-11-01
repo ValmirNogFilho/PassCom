@@ -19,6 +19,7 @@
 
 .route menu .icon {
     padding: 1rem;
+    border-radius: 5px;
 }
 
 .route menu .icon img{  

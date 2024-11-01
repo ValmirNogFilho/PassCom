@@ -10,7 +10,7 @@ header{
 }
 
 .logo {
-    height: calc(5rem - 20%);
+    height: calc(5rem - 80%);
 }
 
 header button {

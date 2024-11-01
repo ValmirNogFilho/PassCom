@@ -4,11 +4,10 @@ import SelectBoxes from '../components/SelectBoxes'
 import Header from '../components/Header'
 import { apiService } from '../axios'
 import Container from '../components/Container'
-import Footer from '../components/Footer'
 
 const Home = () => {
   const [airports, setAirports] = useState([])
-
+  const [name, setName] = useState("")
   useEffect(() => {
     const fetchCapitals = async () => {
       try {
@@ -18,14 +17,24 @@ const Home = () => {
         console.error(error)
       }
     }
+    const fetchName = async () => {
+      try {
+        const res = await apiService.getUser()
+        const name = `, ${res.data.Data.user.Name}` 
+        setName(name)
+      } catch (error) {
+        console.error(error)
+      }
+    }
     fetchCapitals()
+    fetchName()
   }, [])
 
   return (
     <div className="home">
       <Header />
       <div className="title">
-        <h1>Voar nunca foi tão fácil.</h1>
+        <h1>Voar nunca foi tão fácil{name}.</h1>
         <h3>Qual o seu destino?</h3>
       </div>
       <div className="content">
@@ -38,7 +47,6 @@ const Home = () => {
           <Container />
         </div>
       </div>
-      <Footer />
     </div>
   )
 }
