@@ -43,25 +43,26 @@ func GetAirports(request models.Request) models.Response {
 // Parameters:
 //   - auth: A string representing the authentication token provided by the client.
 //   - conn: A net.Conn object representing the connection to the client.
-func AllRoutes(auth string, conn net.Conn) {
+func AllRoutes(auth string, conn net.Conn) models.Response {
 
 	_, exists := SessionIfExists(auth)
 
 	if !exists {
-		WriteNewResponse(models.Response{
-			Error: "not authorized",
-		}, conn)
-		return
+		return models.Response{
+			Error:  "not authorized",
+			Status: http.StatusUnauthorized,
+		}
 	}
 
 	dao := dao.GetFlightDAO()
 	dao.New()
 
-	WriteNewResponse(models.Response{
+	return models.Response{
 		Data: map[string]interface{}{
 			"all-routes": dao.FindAll(),
 		},
-	}, conn)
+		Status: http.StatusOK,
+	}
 
 }
 
@@ -155,7 +156,8 @@ func Flights(request models.Request) models.Response {
 	responseData, err := getRoute(flightsRequest.FlightIds)
 	if err != nil {
 		return models.Response{
-			Error: err.Error(),
+			Error:  err.Error(),
+			Status: http.StatusBadRequest,
 		}
 	}
 
@@ -163,6 +165,7 @@ func Flights(request models.Request) models.Response {
 		Data: map[string]interface{}{
 			"Flights": responseData,
 		},
+		Status: http.StatusOK,
 	}
 }
 

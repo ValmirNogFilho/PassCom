@@ -1,9 +1,7 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
-	"net"
 	"time"
 	"vendepass/internal/dao"
 	"vendepass/internal/models"
@@ -29,32 +27,6 @@ func CleanupSessions(timeout time.Duration) {
 				dao.GetSessionDAO().Delete(session)
 			}
 		}
-	}
-}
-
-// WriteNewResponse sends a response to the client over the provided net.Conn connection.
-// It first checks if the response's Data field is nil. If it is, it initializes it as an empty map.
-// Then, it marshals the response into JSON format. If the marshalling process encounters an error,
-// it logs the error and returns without sending any response.
-// After successfully marshalling the response, it writes the JSON data to the connection.
-// If there is an error while writing the data, it logs the error and returns without sending any response.
-//
-// Parameters:
-//   - response: A models.Response struct containing the response data to be sent to the client.
-//   - conn: A net.Conn object representing the client connection.
-func WriteNewResponse(response models.Response, conn net.Conn) {
-	if response.Data == nil {
-		response.Data = make(map[string]interface{})
-	}
-
-	jsonData, err := json.Marshal(response)
-	if err != nil {
-		fmt.Println("Error marshalling response:", err)
-		return
-	}
-	_, err = conn.Write(jsonData)
-	if err != nil {
-		fmt.Println("Error writing response:", err)
 	}
 }
 

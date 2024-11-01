@@ -89,12 +89,14 @@ func BuyTicket(request models.Request) models.Response {
 			Data: map[string]interface{}{
 				"msg": "success",
 			},
+			Status: http.StatusOK,
 		}
 	}
 	return models.Response{
 		Data: map[string]interface{}{
 			"Error": "not available seats",
 		},
+		Status: http.StatusNotAcceptable,
 	}
 
 }
@@ -115,7 +117,8 @@ func CancelBuy(request models.Request) models.Response {
 
 	if !exists {
 		return models.Response{
-			Error: "not authorized",
+			Error:  "not authorized",
+			Status: http.StatusUnauthorized,
 		}
 
 	}
@@ -129,7 +132,8 @@ func CancelBuy(request models.Request) models.Response {
 
 	if err != nil {
 		return models.Response{
-			Error: "ticket not found",
+			Error:  "ticket not found",
+			Status: http.StatusNotFound,
 		}
 	}
 
@@ -143,5 +147,6 @@ func CancelBuy(request models.Request) models.Response {
 		Data: map[string]interface{}{
 			"msg": "success",
 		},
+		Status: http.StatusOK,
 	}
 }

@@ -143,6 +143,7 @@ func GetUserBySessionToken(request models.Request) models.Response {
 
 	if !exists {
 		response.Error = "session not found"
+		response.Status = http.StatusNotFound
 		return response
 	}
 
@@ -152,6 +153,8 @@ func GetUserBySessionToken(request models.Request) models.Response {
 
 	if err != nil {
 		response.Error = "client not found"
+		response.Status = http.StatusNotFound
+		return response
 	}
 
 	response.Data["user"] = map[string]interface{}{
@@ -159,5 +162,6 @@ func GetUserBySessionToken(request models.Request) models.Response {
 		"ClientFlights": client.ClientFlights,
 		"Username":      client.Username,
 	}
+	response.Status = http.StatusOK
 	return response
 }
