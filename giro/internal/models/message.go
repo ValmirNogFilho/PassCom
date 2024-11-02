@@ -8,5 +8,5 @@ type Message struct {
 	From        string         `json:"From"`        // Serializado como string
 	To          string         `json:"To"`          // Serializado como string
 	VectorClock map[string]int `json:"VectorClock"` // Mapeia como string para evitar problemas
-	Request
+	Body        interface{}    `json:"Body"`        // Pode ser qualquer tipo de dado serializável
 }

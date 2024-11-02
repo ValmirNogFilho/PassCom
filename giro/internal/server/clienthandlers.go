@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"giro/internal/models"
-	"log"
 	"net/http"
 )
 
@@ -23,15 +22,6 @@ func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-}
-
-func (s *System) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	ip := r.RemoteAddr
-
-	log.Printf("Heartbeat check successful from %s\n", ip)
 }
 
 func handleGetAirports(w http.ResponseWriter, r *http.Request) {
