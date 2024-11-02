@@ -131,7 +131,7 @@ func (dao *DBFlightDAO) FindBySource(id uint) ([]models.Flight, error) {
 	return flights, nil
 }
 
-func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) (*models.Flight, error) {
+func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) ([]models.Flight, error) {
 
 	db, err := utils.OpenDb()
 
@@ -140,62 +140,20 @@ func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) (*models.Fli
 	}
 	defer utils.CloseDb(db)
 
-	var flight models.Flight
+	var flights []models.Flight = make([]models.Flight, 0)
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
 		Preload("Tickets").
 		Where(&models.Flight{
 			OriginAirportID:      source,
 			DestinationAirportID: dest,
-		}).Find(&flight).Error; err != nil {
+		}).Find(&flights).Error; err != nil {
 		log.Println("Error searching flight:", err)
 		return nil, err
 	}
-	log.Println("Flights found:", flight)
-	return &flight, nil
+	log.Println("Flights found:", flights)
+	return flights, nil
 }
-
-// func (dao *DBFlightDAO) BreadthFirstSearch(source uuid.UUID, dest uuid.UUID) ([]*models.Flight, error) {
-// 	dao.mu.RLock()
-// 	defer dao.mu.RUnlock()
-// 	visited := make(map[uuid.UUID]bool, len(dao.data))
-// 	queue := []uuid.UUID{source}
-// 	visited[source] = true
-// 	parent := make(map[uuid.UUID]uuid.UUID, len(dao.data))
-// 	parent[source] = source
-
-// 	for len(queue) > 0 {
-// 		current := queue[0]
-// 		queue = queue[1:]
-// 		if current == dest {
-// 			break
-// 		}
-
-// 		for neighbor, flight := range dao.data[current] {
-// 			if !visited[neighbor] && flight.Seats > 0 {
-// 				visited[neighbor] = true
-// 				queue = append(queue, neighbor)
-// 				parent[neighbor] = current
-// 			}
-// 		}
-// 	}
-
-// 	path := []*models.Flight{}
-// 	current := dest
-
-// 	if !visited[dest] {
-// 		return nil, errors.New("no route available")
-// 	}
-
-// 	for current != source {
-// 		prev := parent[current]
-// 		flight := dao.data[prev][current]
-// 		path = append([]*models.Flight{flight}, path...)
-// 		current = prev
-// 	}
-
-// 	return path, nil
-// }
 
 func (dao *DBFlightDAO) DeleteAll() {
 

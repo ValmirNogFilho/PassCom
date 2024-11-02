@@ -19,15 +19,15 @@ const Container = () => {
             </div>
             <menu>
                 <div className="flight icon" onClick={() => setPage(0)}
-                    style={{backgroundColor: page===0?"#bd1616":"transparent"}}>
+                    style={{backgroundColor: page===0?"#5ad733":"transparent"}}>
                     <img src={src} alt="" />
                 </div>
                 <div className="cart icon" onClick={() => setPage(1)}
-                    style={{backgroundColor: page===1?"#bd1616":"transparent"}}>
+                    style={{backgroundColor: page===1?"#5ad733":"transparent"}}>
                     <img src={cart} alt="" />
                 </div>
                 <div className="ticket icon" onClick={() => setPage(2)}
-                    style={{backgroundColor: page===2?"#bd1616":"transparent"}}>
+                    style={{backgroundColor: page===2?"#5ad733":"transparent"}}>
                     <img src={ticket} alt="" />                     
                 </div>
             </menu>

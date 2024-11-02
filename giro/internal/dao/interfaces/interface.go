@@ -14,8 +14,7 @@ type FlightDAO interface {
 	Delete(models.Flight) error
 	FindById(uint) (*models.Flight, error)
 	FindBySource(uint) ([]models.Flight, error)
-	FindBySourceAndDest(uint, uint) (*models.Flight, error)
-	// BreadthFirstSearch(source uint, dest uint) ([]models.Flight, error)
+	FindBySourceAndDest(uint, uint) ([]models.Flight, error)
 	DeleteAll()
 	New()
 }

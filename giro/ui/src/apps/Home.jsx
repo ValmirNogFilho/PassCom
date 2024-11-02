@@ -34,7 +34,7 @@ const Home = () => {
     <div className="home">
       <Header />
       <div className="title">
-        <h1>Voar nunca foi tão fácil{name}.</h1>
+        <h1>Venha voar conosco{name}!</h1>
         <h3>Qual o seu destino?</h3>
       </div>
       <div className="content">

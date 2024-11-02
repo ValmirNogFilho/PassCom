@@ -4,7 +4,7 @@
             "previewLimit": 50,
             "driver": "SQLite",
             "name": "valmas",
-            "database": "${workspaceFolder:PassCom}/company-A/cmd/test.db"
+            "database": "${workspaceFolder:PassCom}/giro/database.db"
         }
     ],
     "sqltools.useNodeRuntime": true

@@ -20,9 +20,9 @@
 }
 
 .login {
-    background-color: #bd0000;
+    background-color: #0e1e18;
     opacity: 0.8;
-    background-image: linear-gradient(30deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(150deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(30deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(150deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(60deg, #f7524577 25%, transparent 25.5%, transparent 75%, #f7524577 75%, #f7524577), linear-gradient(60deg, #f7524577 25%, transparent 25.5%, transparent 75%, #f7524577 75%, #f7524577);
+    background-image: linear-gradient(30deg, #5ad733 12%, transparent 12.5%, transparent 87%, #5ad733 87.5%, #5ad733), linear-gradient(150deg, #5ad733 12%, transparent 12.5%, transparent 87%, #5ad733 87.5%, #5ad733), linear-gradient(30deg, #5ad733 12%, transparent 12.5%, transparent 87%, #5ad733 87.5%, #5ad733), linear-gradient(150deg, #5ad733 12%, transparent 12.5%, transparent 87%, #5ad733 87.5%, #5ad733), linear-gradient(60deg, #5ad73377 25%, transparent 25.5%, transparent 75%, #5ad73377 75%, #5ad73377), linear-gradient(60deg, #5ad73377 25%, transparent 25.5%, transparent 75%, #5ad73377 75%, #5ad73377);
     background-size: 50px 88px;
     background-position: 0 0, 0 0, 25px 44px, 25px 44px, 0 0, 25px 44px;
 
@@ -33,7 +33,7 @@
 }
 
 .button {
-    background: var(--theme);
+    background: #5ad733;
     border-radius: 10px;
     outline: none;
     border: none;
@@ -45,7 +45,7 @@
 
 .disabled {
     /* background: #ccc; */
-    background-color: rgba(189, 0, 0, 0.3);
+    background-color: var(--theme);
 }
 
 .login-input {
@@ -67,7 +67,7 @@
 }
 
 .button:not(.disabled):hover {
-    background-color: #8a0000;
+    background-color: var(--theme);
 }
 
 .advice {
@@ -76,7 +76,8 @@
     margin: 0;
 }
 
-.login-input, .button {
+.login-input,
+.button {
     font-size: large;
     height: 3rem;
     width: 70%;

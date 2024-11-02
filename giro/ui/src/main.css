@@ -1,5 +1,5 @@
 :root {
-    --theme: #bd0000;
+    --theme: #0e1e18;
     --bg: #e5e7eb;
     --grey: #d4d4d8;
 }
@@ -8,7 +8,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Commissioner", sans-serif;
+    font-family: "Lexend", sans-serif;
 }
 
 @media (max-width: 860px) {
