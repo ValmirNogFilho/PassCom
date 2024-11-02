@@ -1,8 +1,9 @@
 services:
+  # Serviço Boreal
   boreal:
     build:
-      context: ./boreal  # Caminho para o diretório onde o Dockerfile está
+      context: ./boreal
     container_name: boreal
     ports:
-      - "8080:8080"  # Mapeie uma porta externa diferente para cada instância
-    command: ["/app/app"]
+      - "8080:8080"
+    command: ["./app"]
