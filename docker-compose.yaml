@@ -23,6 +23,31 @@ services:
     depends_on:
       - giro
 
+  # Serviço Rumos
+  # rumos:
+  #   build:
+  #     context: ./rumos
+  #   container_name: rumos
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     - ./rumos/internal/stubs:/app/internal/stubs
+  #     - ./rumos/test.db:/app/test.db
+  #   networks:
+  #     - passcom
+  #   command: ["./api"]
+
+  # rumos_ui:
+  #   build:
+  #     context: ./rumos/ui
+  #   ports:
+  #     - "5173:5173"
+  #   networks:
+  #     - passcom
+  #   depends_on:
+  #     - rumos
+
 networks:
   passcom:
     driver: bridge
+    external: true

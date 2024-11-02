@@ -8,18 +8,21 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o app cmd/app/main.go
 RUN go build -o api cmd/api/api.go
 
-FROM alpine:latest
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/app .
+# Copiar o binário compilado da etapa de build
 COPY --from=builder /app/api .
 
-RUN chmod +x app api
-RUN apk add --no-cache libc6-compat
+# Tornar o binário executável
+RUN chmod +x api
 
-EXPOSE 9999
+# Instalar dependências mínimas, caso seu app precise
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 EXPOSE 8888
