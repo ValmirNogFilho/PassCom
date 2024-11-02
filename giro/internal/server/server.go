@@ -63,7 +63,7 @@ func (s *System) StartServer() error {
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/user", handleGetUser)
-	http.HandleFunc("/route", handleGetRoute) //!
+	http.HandleFunc("/route", handleGetRoute)
 	http.HandleFunc("/flights", handleGetFlights)
 	http.HandleFunc("/ticket", handleTicket)
 	http.HandleFunc("/tickets", handleGetTickets)

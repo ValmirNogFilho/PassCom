@@ -12,4 +12,5 @@ type Session struct {
 	ClientID       uint
 	LastTimeActive time.Time
 	Mu             sync.RWMutex
+	Wishlist       []Flight
 }

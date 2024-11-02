@@ -102,22 +102,15 @@ func Route(request models.Request) models.Response {
 		}
 	}
 
-	path, path_err := dao.GetFlightDAO().FindBySourceAndDest(src.ID, dest.ID)
-	if path_err != nil {
+	paths, paths_err := dao.GetFlightDAO().FindBySourceAndDest(src.ID, dest.ID)
+	if paths_err != nil {
 		response.Error = "no route"
 	} else {
-		cities_path := make([]models.Route, len(path))
-		for i, flight := range path {
-			cities_path[i].Path = make([]models.City, 2)
-			cities_path[i].FlightId = flight.ID
-			cities_path[i].Path[0] = flight.OriginAirport.City
-			cities_path[i].Path[1] = flight.DestinationAirport.City
-		}
 
 		response.Data = map[string]interface{}{
-			"path": cities_path,
+			"paths": paths,
 		}
-
+		response.Status = http.StatusOK
 	}
 
 	return response

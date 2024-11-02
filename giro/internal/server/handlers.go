@@ -206,20 +206,19 @@ func handleGetRoute(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	// queryParams := r.URL.Query()
+	queryParams := r.URL.Query()
 
-	// src := queryParams.Get("src")
-	// dest := queryParams.Get("dest")
+	src := queryParams.Get("src")
+	dest := queryParams.Get("dest")
 
-	// token := r.Header.Get("Authorization")
-	// writeAndReturnResponse(w, models.Request{
-	// 	Action: "route",
-	// 	Auth:   token,
-	// 	Data: models.RouteRequest{
-	// 		Source: src,
-	// 		Dest:   dest,
-	// 	},
-	// })
+	token := r.Header.Get("Authorization")
+	response := Route(models.Request{
+		Auth: token,
+		Data: models.RouteRequest{
+			Source: src,
+			Dest:   dest,
+		}})
+	returnResponse(w, r, response)
 }
 
 // handleGetUser is an HTTP handler function that retrieves user information.

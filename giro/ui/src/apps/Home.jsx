@@ -8,6 +8,9 @@ import Container from '../components/Container'
 const Home = () => {
   const [airports, setAirports] = useState([])
   const [name, setName] = useState("")
+
+  const [flights, setFlights] = useState([])
+
   useEffect(() => {
     const fetchCapitals = async () => {
       try {
@@ -26,6 +29,20 @@ const Home = () => {
         console.error(error)
       }
     }
+    const fetchFlights = async () => {
+      try {
+        const res = await apiService.getRoute({
+          src: "Aeroporto Internacional de Rio Branco",
+          dest: "Aeroporto Internacional de Maceió"
+        });
+        console.log(res.data.Data.paths)
+        setFlights(res.data.Data.paths)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchFlights();
     fetchCapitals()
     fetchName()
   }, [])
@@ -40,11 +57,11 @@ const Home = () => {
       <div className="content">
 
         <div className="map">
-          <BrazilMap capitals={airports} />
+          <BrazilMap capitals={airports} flights={flights} />
         </div>
         <div className="search">
           <SelectBoxes airports={airports} />
-          <Container />
+          <Container flights={flights}/>
         </div>
       </div>
     </div>

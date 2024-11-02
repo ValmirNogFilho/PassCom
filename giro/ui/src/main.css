@@ -13,7 +13,7 @@
 
 @media (max-width: 860px) {
     .map {
-        width: 100%;
+        width: 20%;
         aspect-ratio: 1;
     }
     header .logo {
@@ -36,7 +36,7 @@
 
 @media (min-width: 861px){
     .map {
-        width: 650px;
+        width: 550px;
         height: 500px;
     }
     .content {

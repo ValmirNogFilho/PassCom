@@ -5,28 +5,28 @@ import cart from "../assets/cart.svg"
 import ticket from "../assets/ticket.svg"
 import Flights from './Flights'
 import Tickets from './Tickets'
-const Container = () => {
+const Container = ({flights}) => {
     const [page, setPage] = useState(0)
     return (
         <div className="route">
             <div className="route-content">
                 {page === 0 ?
-                    <Flights /> :
+                    <Flights flights={flights}/> :
                 page === 1 ? 
                 <div></div> :
                 <Tickets />
                 }
             </div>
             <menu>
-                <div className="flight icon" onClick={() => setPage(0)}
+                <div className="flight-icon icon" onClick={() => setPage(0)}
                     style={{backgroundColor: page===0?"#5ad733":"transparent"}}>
                     <img src={src} alt="" />
                 </div>
-                <div className="cart icon" onClick={() => setPage(1)}
+                <div className="cart-icon icon" onClick={() => setPage(1)}
                     style={{backgroundColor: page===1?"#5ad733":"transparent"}}>
                     <img src={cart} alt="" />
                 </div>
-                <div className="ticket icon" onClick={() => setPage(2)}
+                <div className="ticket-icon icon" onClick={() => setPage(2)}
                     style={{backgroundColor: page===2?"#5ad733":"transparent"}}>
                     <img src={ticket} alt="" />                     
                 </div>

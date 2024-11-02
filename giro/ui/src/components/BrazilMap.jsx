@@ -10,12 +10,23 @@ import "leaflet/dist/leaflet.css";
 import { apiService } from "../axios";
 
 
-const BrazilMap = ({capitals}) => {
+const BrazilMap = ({capitals, flights}) => {
     const [selectedCity, setSelectedCity] = useState("");
     const position = [-15.7801, -47.9292] 
 
     function selectCity(city) {
         setSelectedCity(city);
+    }
+
+    const switchLineColor = (company) => {
+        switch (company) {
+            case "rumos":
+                return "red"
+            case "giro":
+                return "green"
+            default:
+                return "blue"
+        }
     }
 
     return (
@@ -43,26 +54,31 @@ const BrazilMap = ({capitals}) => {
                         </Popup>
                     </Marker>
                 ))}
-                {/* {paths && (
+                {flights && (
                     <>
-                        {paths.map((line, i) => (
-                            <Polyline
-                                key={i}
-                                positions={[
-                                    [
-                                        line.Path[0].Latitude,
-                                        line.Path[0].Longitude,
-                                    ],
-                                    [
-                                        line.Path[1].Latitude,
-                                        line.Path[1].Longitude,
-                                    ],
-                                ]}
-                                color="blue"
-                            />
-                        ))}
+                        {flights.map((line, i) => {
+                            const lineColor = switchLineColor(line.Company)
+                            return (
+                                <Polyline
+                                    key={i}
+                                    pathOptions={{color: lineColor}}
+                                    positions={[
+                                        [
+                                            line.OriginAirport.City.Latitude,
+                                            line.OriginAirport.City.Longitude,
+                                        ],
+                                        [
+                                            line.DestinationAirport.City.Latitude,
+                                            line.DestinationAirport.City.Longitude,
+                                        ],
+                                    ]}
+                                    color="blue"
+                                />
+                            )
+                        }
+                        )}
                     </>
-                )} */}
+                )}
             </MapContainer>
         </>
     );
