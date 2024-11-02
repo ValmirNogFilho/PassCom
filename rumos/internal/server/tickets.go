@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 	"net/http"
-	"vendepass/internal/dao"
-	"vendepass/internal/models"
+	"rumos/internal/dao"
+	"rumos/internal/models"
 )
 
 // GetTickets retrieves all tickets associated with the authenticated client.

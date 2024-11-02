@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"vendepass/internal/dao"
-	"vendepass/internal/models"
+	"rumos/internal/dao"
+	"rumos/internal/models"
 )
 
 func mockAirports() {

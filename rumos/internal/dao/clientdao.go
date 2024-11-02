@@ -2,8 +2,8 @@ package dao
 
 import (
 	"log"
-	"vendepass/internal/models"
-	"vendepass/internal/utils"
+	"rumos/internal/models"
+	"rumos/internal/utils"
 )
 
 // DBClientDAO is a data access object (DAO) for managing client data in memory.

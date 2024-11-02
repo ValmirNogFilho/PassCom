@@ -1,0 +1,272 @@
+[
+  {
+    "Name": "Aeroporto Internacional de Rio Branco",
+    "City": {
+      "CityName": "Rio Branco",
+      "State": "AC",
+      "Country": "Brasil",
+      "Latitude": -9.9767,
+      "Longitude": -67.8166
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Maceió",
+    "City": {
+      "CityName": "Maceió",
+      "State": "AL",
+      "Country": "Brasil",
+      "Latitude": -9.6658,
+      "Longitude": -35.7353
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Manaus",
+    "City": {
+      "CityName": "Manaus",
+      "State": "AM",
+      "Country": "Brasil",
+      "Latitude": -3.1190,
+      "Longitude": -60.0217
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Macapá",
+    "City": {
+      "CityName": "Macapá",
+      "State": "AP",
+      "Country": "Brasil",
+      "Latitude": 0.0341,
+      "Longitude": -51.0705
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Salvador",
+    "City": {
+      "CityName": "Salvador",
+      "State": "BA",
+      "Country": "Brasil",
+      "Latitude": -12.9714,
+      "Longitude": -38.5014
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Fortaleza",
+    "City": {
+      "CityName": "Fortaleza",
+      "State": "CE",
+      "Country": "Brasil",
+      "Latitude": -3.7172,
+      "Longitude": -38.5433
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Brasília",
+    "City": {
+      "CityName": "Brasília",
+      "State": "DF",
+      "Country": "Brasil",
+      "Latitude": -15.7801,
+      "Longitude": -47.9292
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Vitória",
+    "City": {
+      "CityName": "Vitória",
+      "State": "ES",
+      "Country": "Brasil",
+      "Latitude": -20.3155,
+      "Longitude": -40.3128
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Goiânia",
+    "City": {
+      "CityName": "Goiânia",
+      "State": "GO",
+      "Country": "Brasil",
+      "Latitude": -16.6786,
+      "Longitude": -49.2538
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de São Luís",
+    "City": {
+      "CityName": "São Luís",
+      "State": "MA",
+      "Country": "Brasil",
+      "Latitude": -2.5489,
+      "Longitude": -44.2828
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Belo Horizonte",
+    "City": {
+      "CityName": "Belo Horizonte",
+      "State": "MG",
+      "Country": "Brasil",
+      "Latitude": -19.8157,
+      "Longitude": -43.9542
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Campo Grande",
+    "City": {
+      "CityName": "Campo Grande",
+      "State": "MS",
+      "Country": "Brasil",
+      "Latitude": -20.4428,
+      "Longitude": -54.6475
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Cuiabá",
+    "City": {
+      "CityName": "Cuiabá",
+      "State": "MT",
+      "Country": "Brasil",
+      "Latitude": -15.5983,
+      "Longitude": -56.0964
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Belém",
+    "City": {
+      "CityName": "Belém",
+      "State": "PA",
+      "Country": "Brasil",
+      "Latitude": -1.4553,
+      "Longitude": -48.5020
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de João Pessoa",
+    "City": {
+      "CityName": "João Pessoa",
+      "State": "PB",
+      "Country": "Brasil",
+      "Latitude": -7.1155,
+      "Longitude": -34.8610
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Curitiba",
+    "City": {
+      "CityName": "Curitiba",
+      "State": "PR",
+      "Country": "Brasil",
+      "Latitude": -25.4284,
+      "Longitude": -49.2733
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Recife",
+    "City": {
+      "CityName": "Recife",
+      "State": "PE",
+      "Country": "Brasil",
+      "Latitude": -8.0476,
+      "Longitude": -34.8776
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Teresina",
+    "City": {
+      "CityName": "Teresina",
+      "State": "PI",
+      "Country": "Brasil",
+      "Latitude": -5.0919,
+      "Longitude": -42.8034
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional do Rio de Janeiro",
+    "City": {
+      "CityName": "Rio de Janeiro",
+      "State": "RJ",
+      "Country": "Brasil",
+      "Latitude": -22.9068,
+      "Longitude": -43.1729
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Natal",
+    "City": {
+      "CityName": "Natal",
+      "State": "RN",
+      "Country": "Brasil",
+      "Latitude": -5.7945,
+      "Longitude": -35.2110
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Porto Alegre",
+    "City": {
+      "CityName": "Porto Alegre",
+      "State": "RS",
+      "Country": "Brasil",
+      "Latitude": -30.0346,
+      "Longitude": -51.2177
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Porto Velho",
+    "City": {
+      "CityName": "Porto Velho",
+      "State": "RO",
+      "Country": "Brasil",
+      "Latitude": -8.7618,
+      "Longitude": -63.9036
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Boa Vista",
+    "City": {
+      "CityName": "Boa Vista",
+      "State": "RR",
+      "Country": "Brasil",
+      "Latitude": 2.8231,
+      "Longitude": -60.6754
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Florianópolis",
+    "City": {
+      "CityName": "Florianópolis",
+      "State": "SC",
+      "Country": "Brasil",
+      "Latitude": -27.5954,
+      "Longitude": -48.5480
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de São Paulo",
+    "City": {
+      "CityName": "São Paulo",
+      "State": "SP",
+      "Country": "Brasil",
+      "Latitude": -23.5505,
+      "Longitude": -46.6333
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Aracaju",
+    "City": {
+      "CityName": "Aracaju",
+      "State": "SE",
+      "Country": "Brasil",
+      "Latitude": -10.9472,
+      "Longitude": -37.0731
+    }
+  },
+  {
+    "Name": "Aeroporto Internacional de Palmas",
+    "City": {
+      "CityName": "Palmas",
+      "State": "TO",
+      "Country": "Brasil",
+      "Latitude": -10.1664,
+      "Longitude": -48.3321
+    }
+  }
+]

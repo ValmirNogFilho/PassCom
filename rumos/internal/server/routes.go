@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"vendepass/internal/dao"
-	"vendepass/internal/models"
+	"rumos/internal/dao"
+	"rumos/internal/models"
 )
 
 func GetAirports(request models.Request) models.Response {

@@ -1,9 +1,9 @@
 package dao
 
 import (
+	"rumos/internal/dao/interfaces"
+	"rumos/internal/models"
 	"sync"
-	"vendepass/internal/dao/interfaces"
-	"vendepass/internal/models"
 
 	"github.com/google/uuid"
 )

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"rumos/internal/models"
+	"rumos/internal/server"
 	"time"
-	"vendepass/internal/models"
-	"vendepass/internal/server"
 )
 
 const (

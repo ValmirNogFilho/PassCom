@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
+	"rumos/internal/dao"
+	"rumos/internal/models"
 	"time"
-	"vendepass/internal/dao"
-	"vendepass/internal/models"
 
 	"github.com/google/uuid"
 )

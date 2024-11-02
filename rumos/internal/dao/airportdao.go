@@ -3,8 +3,8 @@ package dao
 
 import (
 	"log"
-	"vendepass/internal/models"
-	"vendepass/internal/utils"
+	"rumos/internal/models"
+	"rumos/internal/utils"
 )
 
 type DBAirportDAO struct{}

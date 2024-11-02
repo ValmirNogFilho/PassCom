@@ -2,7 +2,7 @@
 package interfaces
 
 import (
-	"vendepass/internal/models"
+	"rumos/internal/models"
 
 	"github.com/google/uuid"
 )

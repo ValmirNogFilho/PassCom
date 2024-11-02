@@ -4,5 +4,3 @@ Protocolos e conceitos a serem implementados/revisitados no algoritmo:
 - Eventual Consistency
 - Vector Clocks
 - Raft
-- 
-

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"rumos/internal/dao"
+	"rumos/internal/models"
 	"time"
-	"vendepass/internal/dao"
-	"vendepass/internal/models"
 )
 
 // passwordMatches checks if the provided password matches the password stored in the client's record.

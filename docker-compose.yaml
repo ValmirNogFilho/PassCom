@@ -1,9 +1,28 @@
 services:
-  # Serviço Boreal
-  boreal:
+  # Serviço Giro
+  giro:
     build:
-      context: ./boreal
-    container_name: boreal
+      context: ./giro
+    container_name: giro
     ports:
-      - "8080:8080"
+      - "9999:9999"
+    volumes:
+      - ./giro/internal/stubs:/app/internal/stubs
+      - ./giro/test.db:/app/test.db
+    networks:
+      - passcom
     command: ["./app"]
+
+  giro_ui:
+    build:
+      context: ./giro/ui
+    ports:
+      - "5173:5173"
+    networks:
+      - passcom
+    depends_on:
+      - giro
+
+networks:
+  passcom:
+    driver: bridge

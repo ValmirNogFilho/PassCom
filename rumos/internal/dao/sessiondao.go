@@ -2,8 +2,8 @@ package dao
 
 import (
 	"errors"
+	"rumos/internal/models"
 	"sync"
-	"vendepass/internal/models"
 
 	"github.com/google/uuid"
 )
