@@ -1,0 +1,87 @@
+[
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440001",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440001",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440002",
+      "Passengers": [],
+      "Seats": 150
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440111",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440003",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440006",
+      "Passengers": [],
+      "Seats": 1
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440002",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440003",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440004",
+      "Passengers": [],
+      "Seats": 180
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440011",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440004",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440005",
+      "Passengers": [],
+      "Seats": 1
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440003",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440005",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440006",
+      "Passengers": [],
+      "Seats": 200
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440004",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440007",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440008",
+      "Passengers": [],
+      "Seats": 160
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440005",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440009",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440010",
+      "Passengers": [],
+      "Seats": 220
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440006",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440011",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440012",
+      "Passengers": [],
+      "Seats": 170
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440007",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440013",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440014",
+      "Passengers": [],
+      "Seats": 190
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440008",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440015",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440016",
+      "Passengers": [],
+      "Seats": 210
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440009",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440017",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440018",
+      "Passengers": [],
+      "Seats": 180
+    },
+    {
+      "Id": "650e8400-e29b-41d4-a716-446655440010",
+      "SourceAirportId": "550e8400-e29b-41d4-a716-446655440019",
+      "DestAirportId": "550e8400-e29b-41d4-a716-446655440020",
+      "Passengers": [],
+      "Seats": 230
+    }
+  ]
+  

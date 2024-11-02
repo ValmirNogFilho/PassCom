@@ -1,0 +1,9 @@
+services:
+  # Serviço Boreal
+  boreal:
+    build:
+      context: ./boreal
+    container_name: boreal
+    ports:
+      - "8080:8080"
+    command: ["./app"]
