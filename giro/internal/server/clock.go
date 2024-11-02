@@ -1,6 +1,11 @@
 package server
 
-import "github.com/google/uuid"
+import "log"
+
+func (s *System) IncrementClock() {
+	s.VectorClock[s.ServerId.String()]++
+	log.Print("Server clock has been incremented")
+}
 
 // CompareClock compara dois relógios de tempo e retorna a relação entre eles.
 //
@@ -9,7 +14,7 @@ import "github.com/google/uuid"
 //   - LESS: se o relógio do sistema é mais antigo que o recebido
 //   - GREATER: se o relógio do sistema é mais novo que o recebido
 //   - CONCURRENT: se os relógios de tempo são concorrentes
-func (s *System) CompareClock(firstClock map[uuid.UUID]int, secondClock map[uuid.UUID]int) int {
+func (s *System) CompareClock(firstClock map[string]int, secondClock map[string]int) int {
 	// Assuma que VC(x) é o relógio do sistema e VC(y) é o relógio recebido.
 	// VC(x) < VC(y) ⇔ ∀z[VC(x)[z] ≤ VC(y)[z]] e ∃w[VC(x)[w] < VC(y)[w]]
 	// Lê-se: VC(x) é mais antigo que VC(y) se, para todo z de VC(x), eles são menores ou iguais
@@ -66,10 +71,11 @@ func (s *System) CompareClock(firstClock map[uuid.UUID]int, secondClock map[uuid
 	return EQUAL
 }
 
-func (s *System) UpdateClock(receivedClock map[uuid.UUID]int) {
+func (s *System) UpdateClock(receivedClock map[string]int) {
 	for id, timestamp := range receivedClock {
 		if _, exists := s.VectorClock[id]; !exists || timestamp > s.VectorClock[id] {
 			s.VectorClock[id] = timestamp
 		}
 	}
+	log.Print("Server clock has been updated")
 }

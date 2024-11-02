@@ -16,22 +16,25 @@ import (
 )
 
 type System struct {
+	ServerName  string
 	ServerId    uuid.UUID
 	Buffer      chan models.Message
-	VectorClock map[uuid.UUID]int
-	Connections map[uuid.UUID]models.Connection
+	VectorClock map[string]int
+	Connections map[string]models.Connection
 	Lock        sync.RWMutex
 	wg          sync.WaitGroup // WaitGroup para controlar goroutines
 	shutdown    chan os.Signal // Canal para sinalizar o encerramento
 }
 
 const (
-	ADDRESS     = ""
-	PORT        = ":9999"
-	BUFFER_SIZE = 100
-	TIMEOUT     = 10 * time.Second
-	timeLimit   = 30 * time.Minute
-	EQUAL       = iota
+	serverName        = "giro"
+	address           = ""
+	port              = ":9999"
+	bufferSize        = 100
+	connectionTimeout = 10 * time.Second
+	heartbeatTimer    = 1 * time.Second
+	sessionTimeLimit  = 30 * time.Minute
+	EQUAL             = iota
 	CONCURRENT
 	NEWER
 	OLDER
@@ -45,12 +48,15 @@ var (
 func GetInstance() *System {
 	once.Do(func() {
 		instance = &System{
+			ServerName:  serverName,
 			ServerId:    uuid.New(),
-			Buffer:      make(chan models.Message, BUFFER_SIZE),
-			VectorClock: make(map[uuid.UUID]int),
-			Connections: make(map[uuid.UUID]models.Connection),
+			Buffer:      make(chan models.Message, bufferSize),
+			VectorClock: make(map[string]int),
+			Connections: make(map[string]models.Connection),
 			shutdown:    make(chan os.Signal, 1),
 		}
+
+		instance.VectorClock[instance.ServerId.String()] = 0
 	})
 	return instance
 }
@@ -58,22 +64,25 @@ func GetInstance() *System {
 func (s *System) StartServer() error {
 	signal.Notify(s.shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	go CleanupSessions(timeLimit)
+	go CleanupSessions(sessionTimeLimit)
 
+	// Usam requests dos clientes
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/user", handleGetUser)
-	http.HandleFunc("/route", handleGetRoute) //!
+	http.HandleFunc("/route", handleGetRoute)
 	http.HandleFunc("/flights", handleGetFlights)
 	http.HandleFunc("/ticket", handleTicket)
 	http.HandleFunc("/tickets", handleGetTickets)
 	http.HandleFunc("/airports", handleGetAirports)
+
+	// Usam messages dos servidores
 	http.HandleFunc("/heartbeat", s.handleHeartbeat)
 
 	server := &http.Server{
-		Addr:         ADDRESS + PORT,
-		ReadTimeout:  TIMEOUT,
-		WriteTimeout: TIMEOUT,
+		Addr:         address + port,
+		ReadTimeout:  connectionTimeout,
+		WriteTimeout: connectionTimeout,
 	}
 
 	log.Println("HTTP Server listening on", server.Addr)
