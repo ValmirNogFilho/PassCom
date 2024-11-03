@@ -100,7 +100,7 @@ func (s *System) RequestConnection(address string, port string) {
 	}
 
 	// Cria a URL com endereço e porta do destino
-	url := fmt.Sprintf("http://%s:%s/connect", address, port)
+	url := fmt.Sprintf("%s%s:%s/connect", urlPrefix, address, port)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating connection request: %v", err)
