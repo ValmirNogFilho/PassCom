@@ -1,8 +1,6 @@
 package server
 
 import (
-	"fmt"
-	"giro/internal/dao"
 	"giro/internal/models"
 	"log"
 	"net/http"
@@ -18,6 +16,8 @@ import (
 type System struct {
 	ServerName  string
 	ServerId    uuid.UUID
+	Address     string
+	Port        string
 	Buffer      chan models.Message
 	VectorClock map[string]int
 	Connections map[string]models.Connection
@@ -28,12 +28,12 @@ type System struct {
 
 const (
 	serverName        = "giro"
-	address           = ""
 	port              = ":9999"
 	bufferSize        = 100
 	connectionTimeout = 10 * time.Second
 	heartbeatTimer    = 1 * time.Second
 	sessionTimeLimit  = 30 * time.Minute
+	urlPrefix         = "http://"
 	EQUAL             = iota
 	CONCURRENT
 	NEWER
@@ -50,6 +50,8 @@ func GetInstance() *System {
 		instance = &System{
 			ServerName:  serverName,
 			ServerId:    uuid.New(),
+			Address:     getLocalIP(),
+			Port:        port,
 			Buffer:      make(chan models.Message, bufferSize),
 			VectorClock: make(map[string]int),
 			Connections: make(map[string]models.Connection),
@@ -64,7 +66,7 @@ func GetInstance() *System {
 func (s *System) StartServer() error {
 	signal.Notify(s.shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	go CleanupSessions(sessionTimeLimit)
+	go s.CleanupSessions(sessionTimeLimit)
 
 	// Usam requests dos clientes
 	http.HandleFunc("/login", handleLogin)
@@ -79,9 +81,10 @@ func (s *System) StartServer() error {
 
 	// Usam messages dos servidores
 	http.HandleFunc("/heartbeat", s.handleHeartbeat)
+	http.HandleFunc("/connect", s.handleConnect)
 
 	server := &http.Server{
-		Addr:         address + port,
+		Addr:         s.Address + s.Port,
 		ReadTimeout:  connectionTimeout,
 		WriteTimeout: connectionTimeout,
 	}
@@ -95,6 +98,8 @@ func (s *System) StartServer() error {
 		}
 	}()
 
+	go s.sendHeartbeats()
+
 	select {
 	case <-s.shutdown:
 		log.Println("Server shutting down...")
@@ -104,49 +109,4 @@ func (s *System) StartServer() error {
 		log.Fatalf("server error: %v", err)
 		return err
 	}
-}
-
-// CleanupSessions periodically checks for inactive sessions and reservations, and cleans them up.
-// It runs every minute and checks each session and its reservations against the provided timeout.
-// If a session or a reservation is inactive (i.e., its last activity time is older than the timeout),
-// it is deleted from the system.
-//
-// Parameters:
-//   - timeout: The duration after which a session or a reservation is considered inactive.
-func CleanupSessions(timeout time.Duration) {
-	ticker := time.NewTicker(time.Minute)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		for _, session := range dao.GetSessionDAO().FindAll() {
-			if time.Since(session.LastTimeActive) > timeout {
-				fmt.Printf("Encerrando sessão %s por inatividade\n", session.ID)
-				dao.GetSessionDAO().Delete(session)
-			}
-		}
-	}
-}
-
-// SessionIfExists checks if a session exists for the given token.
-// If a session is found, it updates the session's last activity time and returns the session along with a boolean value of true.
-// If no session is found or an error occurs during the process, it returns nil and false.
-//
-// Parameters:
-//   - token: A string representing the session token to be checked.
-//
-// Return:
-//   - *models.Session: A pointer to the found session if it exists, or nil if no session is found or an error occurs.
-//   - bool: A boolean value indicating whether a session was found (true) or not (false).
-func SessionIfExists(token string) (*models.Session, bool) {
-	uuid, err := uuid.Parse(token)
-	if err != nil {
-		return nil, false
-	}
-	session, err := dao.GetSessionDAO().FindById(uuid)
-	if err != nil {
-		return nil, false
-	}
-	session.LastTimeActive = time.Now()
-	dao.GetSessionDAO().Update(session)
-	return session, true
 }
