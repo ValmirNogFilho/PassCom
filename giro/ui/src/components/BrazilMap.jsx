@@ -41,19 +41,22 @@ const BrazilMap = ({capitals, flights}) => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                {capitals.map((capital) => (
-                    <Marker
-                        key={capital.name}
-                        position={[capital.City.Latitude, capital.City.Longitude]}
-                        eventHandlers={{
-                            click: () => selectCity(capital.City.Name),
-                        }}
-                    >
-                        <Popup key={capital.Name}>
-                            {capital.Name}, {capital.City.State}
-                        </Popup>
-                    </Marker>
-                ))}
+                {capitals.map((capital) => {
+                    console.log(capital.City)
+                    return (
+                        <Marker
+                            key={capital.name}
+                            position={[capital.City.Latitude, capital.City.Longitude]}
+                            eventHandlers={{
+                                click: () => selectCity(capital.City.Name),
+                            }}
+                        >
+                            <Popup key={capital.Name}>
+                                {capital.Name}, {capital.City.State}
+                            </Popup>
+                        </Marker>
+                    )
+                })}
                 {flights && (
                     <>
                         {flights.map((line, i) => {
