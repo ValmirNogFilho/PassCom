@@ -103,7 +103,7 @@ func (s *System) StartServer() error {
 
 	select {
 	case <-s.shutdown:
-		storeSystemVars(s)
+		s.storeSystemVars()
 		log.Println("Server shutting down...")
 		s.wg.Wait()
 		return server.Close()
@@ -113,7 +113,7 @@ func (s *System) StartServer() error {
 	}
 }
 
-func storeSystemVars(s *System) {
+func (s *System) storeSystemVars() {
 	file, err := os.Create("systemvars.json")
 	if err != nil {
 		log.Fatal(err)
