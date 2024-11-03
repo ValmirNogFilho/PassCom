@@ -35,8 +35,8 @@ func GetTickets(request models.Request) models.Response {
 		flightresponse := make(map[string]interface{})
 		flightresponse["Src"] = flight.OriginAirport.City
 		flightresponse["Dest"] = flight.DestinationAirport.City
-		flightresponse["Id"] = ticket.ID
-		flightresponse["Seats"] = flight.Seats
+		flightresponse["ID"] = ticket.ID
+		flightresponse["Company"] = flight.Company
 		responseData = append(responseData, flightresponse)
 	}
 
@@ -112,7 +112,7 @@ func BuyTicket(request models.Request) models.Response {
 //
 // Return:
 //   - No return value.
-func CancelBuy(request models.Request) models.Response {
+func CancelBuy(id uint, request models.Request) models.Response {
 	_, exists := SessionIfExists(request.Auth)
 
 	if !exists {
@@ -123,12 +123,7 @@ func CancelBuy(request models.Request) models.Response {
 
 	}
 
-	var cancelBuy models.CancelBuyRequest
-
-	jsonData, _ := json.Marshal(request.Data)
-	json.Unmarshal(jsonData, &cancelBuy)
-
-	ticket, err := dao.GetTicketDAO().FindById(cancelBuy.TicketId)
+	ticket, err := dao.GetTicketDAO().FindById(id)
 
 	if err != nil {
 		return models.Response{

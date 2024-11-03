@@ -75,6 +75,7 @@ func (s *System) StartServer() error {
 	http.HandleFunc("/ticket", handleTicket)
 	http.HandleFunc("/tickets", handleGetTickets)
 	http.HandleFunc("/airports", handleGetAirports)
+	http.HandleFunc("/wishlist", handleWishlist)
 
 	// Usam messages dos servidores
 	http.HandleFunc("/heartbeat", s.handleHeartbeat)

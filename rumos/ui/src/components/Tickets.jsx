@@ -8,7 +8,6 @@ const Tickets = () => {
       try {
         const res = await apiService.getTickets();
         setTickets(res.data.Data.Tickets)
-        console.log(tickets)
       } catch (error) {
         console.error(error)
       }

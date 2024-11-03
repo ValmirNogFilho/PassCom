@@ -8,8 +8,17 @@ import Container from '../components/Container'
 const Home = () => {
   const [airports, setAirports] = useState([])
   const [name, setName] = useState("")
-
+  const [srcValue, setSrcValue] = useState("Origem")
+  const [destValue, setDestValue] = useState("Destino")
   const [flights, setFlights] = useState([])
+
+  const addToCart = async (ID) => {
+    try {
+      const res = await apiService.addToWishlist({ FlightId: ID })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
     const fetchCapitals = async () => {
@@ -23,29 +32,31 @@ const Home = () => {
     const fetchName = async () => {
       try {
         const res = await apiService.getUser()
-        const name = `, ${res.data.Data.user.Name}` 
+        const name = `, ${res.data.Data.user.Name}`
         setName(name)
       } catch (error) {
         console.error(error)
       }
     }
-    const fetchFlights = async () => {
-      try {
-        const res = await apiService.getRoute({
-          src: "Aeroporto Internacional de Rio Branco",
-          dest: "Aeroporto Internacional de Maceió"
-        });
-        console.log(res.data.Data.paths)
-        setFlights(res.data.Data.paths)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    fetchFlights();
     fetchCapitals()
     fetchName()
   }, [])
+
+  const fetchFlights = async () => {
+    try {
+      const res = await apiService.getRoute({
+        src: srcValue,
+        dest: destValue
+      });
+      console.log(res.data.Data.paths)
+      setFlights(res.data.Data.paths)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  if (srcValue !== "Origem" && destValue !== "Destino")fetchFlights();
+
 
   return (
     <div className="home">
@@ -60,8 +71,9 @@ const Home = () => {
           <BrazilMap capitals={airports} flights={flights} />
         </div>
         <div className="search">
-          <SelectBoxes airports={airports} />
-          <Container flights={flights}/>
+          <SelectBoxes airports={airports} srcValue={srcValue} 
+          destValue={destValue} setSrcValue={setSrcValue} setDestValue={setDestValue} />
+          <Container flights={flights} addToCart={addToCart} />
         </div>
       </div>
     </div>

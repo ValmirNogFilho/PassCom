@@ -54,6 +54,7 @@ func (dao *MemorySessionDAO) Insert(t *models.Session) {
 	id := uuid.New()
 	t.ID = id
 	t.Mu = sync.RWMutex{}
+	t.Wishlist = make([]models.Flight, 0)
 	dao.data[id] = t
 }
 

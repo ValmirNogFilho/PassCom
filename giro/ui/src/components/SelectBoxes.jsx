@@ -2,9 +2,8 @@ import React, { useState } from 'react'
 import "./selectboxes.css"
 import dest from "../assets/dest.svg"
 import src from "../assets/src.svg"
-const SelectBoxes = ({ airports }) => {
-    const [srcValue, setSrcValue] = useState("Origem")
-    const [destValue, setDestValue] = useState("Destino")
+const SelectBoxes = ({ airports, srcValue, setSrcValue, destValue, setDestValue}) => {
+    
     const [isAnimating, setIsAnimating] = useState(false);
 
     const swap = () => {
@@ -29,7 +28,7 @@ const SelectBoxes = ({ airports }) => {
                         Origem
                     </option>
                     {airports.map((airport, i) => (
-                        <option key={i} value={airport.City.CityName}>
+                        <option key={i} value={airport.Name}>
                             {airport.City.CityName}
                         </option>
                     ))}
@@ -54,7 +53,7 @@ const SelectBoxes = ({ airports }) => {
                         Destino
                     </option>
                     {airports.map((airport, i) => (
-                        <option key={i} value={airport.City.CityName}>
+                        <option key={i} value={airport.Name}>
                             {airport.City.CityName}
                         </option>
                     ))}

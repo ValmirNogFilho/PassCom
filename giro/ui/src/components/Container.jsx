@@ -5,15 +5,16 @@ import cart from "../assets/cart.svg"
 import ticket from "../assets/ticket.svg"
 import Flights from './Flights'
 import Tickets from './Tickets'
-const Container = ({flights}) => {
+import Cart from './Cart'
+const Container = ({flights, addToCart}) => {
     const [page, setPage] = useState(0)
     return (
         <div className="route">
             <div className="route-content">
                 {page === 0 ?
-                    <Flights flights={flights}/> :
+                    <Flights flights={flights} addToCart={addToCart}/> :
                 page === 1 ? 
-                <div></div> :
+                <Cart/>:
                 <Tickets />
                 }
             </div>
