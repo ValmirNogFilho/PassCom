@@ -1,0 +1,10 @@
+{
+  "Address": "10.0.0.104",
+  "Connections": {},
+  "Port": ":9999",
+  "ServerId": "2f2c2cb7-651e-4fae-9ae2-e2924cc7a493",
+  "ServerName": "giro",
+  "VectorClock": {
+    "2f2c2cb7-651e-4fae-9ae2-e2924cc7a493": 0
+  }
+}
