@@ -78,9 +78,6 @@ func (s *System) updateConnectionStatus(id string, isOnline bool) {
 	if exists {
 		conn.IsOnline = isOnline
 		s.Connections[id] = conn
-		if !isOnline {
-			log.Printf("Connection %s is offline", id)
-		}
 	}
 }
 

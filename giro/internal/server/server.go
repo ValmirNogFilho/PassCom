@@ -33,6 +33,7 @@ const (
 	connectionTimeout = 10 * time.Second
 	heartbeatTimer    = 1 * time.Second
 	sessionTimeLimit  = 30 * time.Minute
+	urlPrefix         = "http://"
 	EQUAL             = iota
 	CONCURRENT
 	NEWER
