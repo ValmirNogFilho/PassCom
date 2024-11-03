@@ -1,3 +1,9 @@
+# Equipe:
+
+[![Pierre Machado](https://github.com/pierremachado.png?size=20)](https://github.com/pierremachado) [Pierre Machado](https://github.com/pierremachado)
+
+[![Valmir Nogueira](https://github.com/valmirnogfilho.png?size=20)](https://github.com/valmirnogfilho) [Valmir Nogueira](https://github.com/valmirnogfilho)
+
 Protocolos e conceitos estudados:
 - Gossip Protocol
 - Reliable Broadcast (Total Order)
@@ -9,6 +15,26 @@ Protocolos e conceitos estudados:
 - Last Writer Wins (alcancável com relógios vetoriais)
 
 O que será implementado:
-- Compartilhamento de banco de dados entre os nós conectados
-- Broadcast
-- Transação atômica entre os servidores
+- Transação atômica entre servidores
+
+# Resumo
+
+# Introdução
+
+# Arquitetura da solução
+
+# Protocolo de comunicação
+
+# Roteamento
+
+# Concorrência Distribuída
+
+# Confiabilidade da solução
+
+# Avaliação da Solução
+
+# Documentação do código
+
+# Emprego do Docker
+
+# Conclusão
