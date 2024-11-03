@@ -1,9 +1,10 @@
 import "./flights.css"
 import * as utils from "../utils/utils"
-const Flights = ({ flights, addToCart }) => {
+const Flights = ({ flights, addToCart, setCartItemCount}) => {
 
   const handleAdd = (ID) => {
     addToCart(ID)
+    setCartItemCount((prev) => prev + 1)
   }
 
   return (

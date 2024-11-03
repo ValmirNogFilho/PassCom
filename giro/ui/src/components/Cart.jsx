@@ -3,13 +3,14 @@ import { apiService } from '../axios';
 import * as utils from "../utils/utils";
 import "./flights.css";
 
-const Cart = () => {
+const Cart = ({setCartItemCount}) => {
     const [wishes, setWishes] = useState([]);
 
     const removeFromWishlist = async (FlightId, index) => {
         try {
             await apiService.removeFromWishlist({ FlightId });
             setWishes((prevWishes) => prevWishes.filter((wish, i) => i !== index));
+            setCartItemCount((prev) => prev - 1)
         } catch (error) {
             console.error(error);
         }
@@ -19,16 +20,17 @@ const Cart = () => {
         try {
             // Realiza a compra no servidor
             await apiService.buyTicket({ FlightId });
-            
+
             // Remove o item do servidor
             await apiService.removeFromWishlist({ FlightId });
-            
+
             // Remove apenas a primeira ocorrência no estado local (usando o índice passado)
             setWishes((prevWishes) => {
                 const newWishes = [...prevWishes];
                 newWishes.splice(index, 1); // Remove o item pelo índice
                 return newWishes;
             });
+            setCartItemCount((prev) => prev - 1)
         } catch (error) {
             console.error(error);
         }

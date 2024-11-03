@@ -6,6 +6,7 @@ import { apiService } from '../axios'
 import Container from '../components/Container'
 
 const Home = () => {
+  const [cartItemCount, setCartItemCount] = useState(0)
   const [airports, setAirports] = useState([])
   const [name, setName] = useState("")
   const [srcValue, setSrcValue] = useState("Origem")
@@ -48,13 +49,12 @@ const Home = () => {
         src: srcValue,
         dest: destValue,
       });
-      console.log(res.data.Data.paths);
       setFlights(res.data.Data.paths);
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   useEffect(() => {
     if (srcValue !== "Origem" && destValue !== "Destino") {
       fetchFlights();
@@ -75,9 +75,10 @@ const Home = () => {
           <BrazilMap capitals={airports} flights={flights} />
         </div>
         <div className="search">
-          <SelectBoxes airports={airports} srcValue={srcValue} 
-          destValue={destValue} setSrcValue={setSrcValue} setDestValue={setDestValue} />
-          <Container flights={flights} addToCart={addToCart} />
+          <SelectBoxes airports={airports} srcValue={srcValue}
+            destValue={destValue} setSrcValue={setSrcValue} setDestValue={setDestValue} />
+          <Container flights={flights} addToCart={addToCart} 
+          cartItemCount={cartItemCount} setCartItemCount={setCartItemCount} />
         </div>
       </div>
     </div>
