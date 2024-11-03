@@ -155,7 +155,7 @@ func (s *System) HandleCLIServer() {
 	}
 	defer listener.Close()
 
-	log.Println("CLI server waiting for connections in port", cliPort)
+	log.Println("See your server working on the TCP CLI server on port", cliPort)
 
 	for {
 		conn, err := listener.Accept()
