@@ -1,9 +1,3 @@
-# Equipe:
-
-[![Pierre Machado](https://github.com/pierremachado.png?size=20)](https://github.com/pierremachado) [Pierre Machado](https://github.com/pierremachado)
-
-[![Valmir Nogueira](https://github.com/valmirnogfilho.png?size=20)](https://github.com/valmirnogfilho) [Valmir Nogueira](https://github.com/valmirnogfilho)
-
 Protocolos e conceitos estudados:
 - Gossip Protocol
 - Reliable Broadcast (Total Order)
@@ -20,6 +14,12 @@ O que será implementado:
 # Resumo
 
 # Introdução
+
+### Equipe:
+
+[![Pierre Machado](https://github.com/pierremachado.png?size=20)](https://github.com/pierremachado) [Pierre Machado](https://github.com/pierremachado)
+
+[![Valmir Nogueira](https://github.com/valmirnogfilho.png?size=20)](https://github.com/valmirnogfilho) [Valmir Nogueira](https://github.com/valmirnogfilho)
 
 # Arquitetura da solução
 
