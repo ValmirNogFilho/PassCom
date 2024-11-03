@@ -1,12 +1,17 @@
 package server
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
 	"giro/internal/models"
+	"giro/internal/utils"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -30,6 +35,7 @@ type System struct {
 const (
 	serverName        = "giro"
 	port              = ":9999"
+	cliPort           = ":7772"
 	bufferSize        = 100
 	connectionTimeout = 10 * time.Second
 	heartbeatTimer    = 1 * time.Second
@@ -101,6 +107,8 @@ func (s *System) StartServer() error {
 
 	go s.sendHeartbeats()
 
+	go s.HandleCLIServer()
+
 	select {
 	case <-s.shutdown:
 		s.storeSystemVars()
@@ -134,8 +142,89 @@ func (s *System) storeSystemVars() {
 	}
 
 	if _, err := file.Write(jsonData); err != nil {
-		log.Fatal("Erro serializing vars to JSON:", err)
+		log.Fatal("Error serializing vars to JSON:", err)
 	}
 
 	log.Println("System vars saved.")
+}
+
+func (s *System) HandleCLIServer() {
+	listener, err := net.Listen("tcp", cliPort)
+	if err != nil {
+		log.Fatal("Error initiating server:", err)
+	}
+	defer listener.Close()
+
+	log.Println("CLI server waiting for connections in port", cliPort)
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Println("Error accepting connection:", err)
+			continue
+		}
+
+		go s.handleCLIConnection(conn)
+	}
+}
+
+func (s *System) handleCLIConnection(conn net.Conn) {
+	defer conn.Close()
+	conn.Write([]byte("Welcome to the CLI server!\nType 'help' to see the commands.\n"))
+
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		input := strings.TrimSpace(scanner.Text())
+		parts := strings.Fields(input)
+
+		if len(parts) == 0 {
+			conn.Write([]byte("Empty command.\n"))
+			continue
+		}
+
+		command := parts[0]
+		args := parts[1:]
+
+		switch command {
+		case "help":
+			conn.Write(
+				[]byte("Available commands:" +
+					"\n- help: to see commands" +
+					"\n- info: to see server informations" +
+					"\n- addconn <server_name> <address> <port>: to add a new connection" +
+					"\n- quit: to close the connection\n"))
+
+		case "info":
+			conn.Write([]byte(s.getServerInfo()))
+
+		case "addconn":
+			if len(args) < 1 {
+				conn.Write([]byte("Error: 'addconn' requires three arguments (server name, address, port).\n"))
+			} else {
+				name := args[0]
+				address := args[1]
+				connPort := args[2]
+				s.RequestConnection(name, address, connPort)
+				conn.Write([]byte("new connection added with port: " + connPort + "\n"))
+			}
+
+		case "quit":
+			conn.Write([]byte("Closing CLI...\n"))
+			return
+
+		default:
+			conn.Write([]byte("Command not found.\n"))
+		}
+	}
+
+}
+
+func (s *System) getServerInfo() string {
+
+	s.Lock.RLock()
+	defer s.Lock.RUnlock()
+	return fmt.Sprintf("\nName: %s\nAddress: %s\nPort: %s\nServerId: %s\n"+
+		"Connections: %v\nVector Clock:%v\n", s.ServerName, s.Address, s.Port,
+		s.ServerId, utils.PrintMap(s.Connections),
+		utils.PrintMap(s.VectorClock))
 }

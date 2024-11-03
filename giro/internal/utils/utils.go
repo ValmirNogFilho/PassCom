@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 // Filter is a generic function that filters a slice of items based on a predicate function.
 // It returns a new slice containing only the elements for which the predicate function returns true.
 //
@@ -35,4 +37,12 @@ func Find[T any](items []T, pred func(T) bool) *T {
 		}
 	}
 	return nil
+}
+
+func PrintMap[V any](m map[string]V) string {
+	str := "\n{"
+	for k, v := range m {
+		str += fmt.Sprintf("\n%v: %v", k, v)
+	}
+	return str + "\n}"
 }
