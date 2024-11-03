@@ -31,6 +31,12 @@ func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	name, ok := body["Name"].(string)
+	if !ok {
+		http.Error(w, "Invalid name format", http.StatusBadRequest)
+		return
+	}
+
 	address, ok := body["Address"].(string)
 	if !ok {
 		http.Error(w, "Invalid Address format", http.StatusBadRequest)
@@ -45,6 +51,7 @@ func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
 
 	// Cria uma nova conexão com os dados extraídos
 	newConnection := models.Connection{
+		Name:     name,
 		Address:  address,
 		Port:     port,
 		IsOnline: true,
@@ -81,14 +88,15 @@ func (s *System) updateConnectionStatus(id string, isOnline bool) {
 	}
 }
 
-func (s *System) RequestConnection(address string, port string) {
+func (s *System) RequestConnection(name string, address string, port string) {
 	// Monta a mensagem de conexão
 	message := models.Message{
 		From: s.ServerId.String(),
 		To:   "", // Destinatário ainda desconhecido
 		Body: map[string]interface{}{
-			"Address": address,
-			"Port":    port,
+			"Name":    s.ServerName,
+			"Address": s.Address,
+			"Port":    s.Port,
 		},
 	}
 
@@ -122,17 +130,43 @@ func (s *System) RequestConnection(address string, port string) {
 		return
 	}
 
-	// Lê a resposta e extrai o ID do servidor conectado (simulação de retorno com ID do destinatário)
+	// Lê a resposta e extrai o ID do servidor conectado
 	var responseMessage models.Message
 	if err := json.NewDecoder(resp.Body).Decode(&responseMessage); err != nil {
 		log.Printf("Error decoding connection response: %v", err)
 		return
 	}
 
+	// Extrai o corpo da resposta e valida os campos
+	body, ok := responseMessage.Body.(map[string]interface{})
+	if !ok {
+		log.Printf("Invalid body format in connection response")
+		return
+	}
+
+	updatedName, ok := body["Name"].(string)
+	if !ok {
+		log.Printf("Invalid name format in connection response")
+		return
+	}
+
+	updatedAddress, ok := body["Address"].(string)
+	if !ok {
+		log.Printf("Invalid address format in connection response")
+		return
+	}
+
+	updatedPort, ok := body["Port"].(string)
+	if !ok {
+		log.Printf("Invalid port format in connection response")
+		return
+	}
+
 	// Atualiza o destinatário com o ID do servidor recebido na resposta
 	newConnection := models.Connection{
-		Address:  address,
-		Port:     port,
+		Name:     updatedName,
+		Address:  updatedAddress,
+		Port:     updatedPort,
 		IsOnline: true,
 	}
 
