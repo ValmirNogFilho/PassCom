@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"giro/internal/models"
 	"log"
 	"net/http"
@@ -103,6 +104,7 @@ func (s *System) StartServer() error {
 
 	select {
 	case <-s.shutdown:
+		s.storeSystemVars()
 		log.Println("Server shutting down...")
 		s.wg.Wait()
 		return server.Close()
@@ -110,4 +112,31 @@ func (s *System) StartServer() error {
 		log.Fatalf("server error: %v", err)
 		return err
 	}
+}
+
+func (s *System) storeSystemVars() {
+	file, err := os.Create("systemvars.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	systemVars := make(map[string]interface{})
+	systemVars["ServerName"] = s.ServerName
+	systemVars["ServerId"] = s.ServerId
+	systemVars["Address"] = s.Address
+	systemVars["Port"] = s.Port
+	systemVars["VectorClock"] = s.VectorClock
+	systemVars["Connections"] = s.Connections
+
+	jsonData, err := json.MarshalIndent(systemVars, "", "  ") // identação
+	if err != nil {
+		log.Fatal("Error identing JSON:", err)
+	}
+
+	if _, err := file.Write(jsonData); err != nil {
+		log.Fatal("Erro serializing vars to JSON:", err)
+	}
+
+	log.Println("System vars saved.")
 }
