@@ -35,7 +35,7 @@ type System struct {
 const (
 	SERVERNAME        = "giro"
 	PORT              = "9999"
-	cliPort           = ":7772"
+	CLIPORT           = ":7772"
 	BUFFERSIZE        = 100
 	CONNECTIONTIMEOUT = 10 * time.Second
 	HEARTBEATTIMER    = 1 * time.Second
@@ -150,13 +150,13 @@ func (s *System) storeSystemVars() {
 }
 
 func (s *System) HandleCLIServer() {
-	listener, err := net.Listen("tcp", cliPort)
+	listener, err := net.Listen("tcp", CLIPORT)
 	if err != nil {
 		log.Fatal("Error initiating server:", err)
 	}
 	defer listener.Close()
 
-	log.Println("See your server working on the TCP CLI server on port", cliPort)
+	log.Println("See your server working on the TCP CLI server on port", CLIPORT)
 
 	for {
 		conn, err := listener.Accept()
