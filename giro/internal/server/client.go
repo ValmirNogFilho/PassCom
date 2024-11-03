@@ -367,5 +367,4 @@ func returnResponse(w http.ResponseWriter, r *http.Request, responseData models.
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseData.Status)
 	json.NewEncoder(w).Encode(responseData)
-
 }

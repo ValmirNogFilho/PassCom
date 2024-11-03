@@ -46,16 +46,20 @@ const Home = () => {
     try {
       const res = await apiService.getRoute({
         src: srcValue,
-        dest: destValue
+        dest: destValue,
       });
-      console.log(res.data.Data.paths)
-      setFlights(res.data.Data.paths)
+      console.log(res.data.Data.paths);
+      setFlights(res.data.Data.paths);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
-
-  if (srcValue !== "Origem" && destValue !== "Destino")fetchFlights();
+  };
+  
+  useEffect(() => {
+    if (srcValue !== "Origem" && destValue !== "Destino") {
+      fetchFlights();
+    }
+  }, [srcValue, destValue]);
 
 
   return (

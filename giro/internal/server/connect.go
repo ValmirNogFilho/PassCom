@@ -66,7 +66,63 @@ func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("New connection from %s: %s:%s", message.From, address, port)
 
+	// Monta a resposta como models.Message contendo o novo models.Connection
+	responseMessage := models.Message{
+		From: s.ServerId.String(),
+		To:   message.From,
+		Body: newConnection,
+	}
+
+	// Define o cabeçalho Content-Type e envia o JSON da resposta
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(responseMessage); err != nil {
+		http.Error(w, "Failed to encode response message", http.StatusInternalServerError)
+	}
+}
+
+func (s *System) handleRequestConnection(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var message models.Message
+	err := json.NewDecoder(r.Body).Decode(&message)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	// Decodifica Body para map[string]interface{} para acessar Address e Port
+	body, ok := message.Body.(map[string]interface{})
+	if !ok {
+		http.Error(w, "Invalid body format", http.StatusBadRequest)
+		return
+	}
+
+	name, ok := body["Name"].(string)
+	if !ok {
+		http.Error(w, "Invalid name format", http.StatusBadRequest)
+		return
+	}
+
+	address, ok := body["Address"].(string)
+	if !ok {
+		http.Error(w, "Invalid Address format", http.StatusBadRequest)
+		return
+	}
+
+	port, ok := body["Port"].(string)
+	if !ok {
+		http.Error(w, "Invalid Port format", http.StatusBadRequest)
+		return
+	}
+
+	// Monta a URL de solicitação de conexão
+	s.RequestConnection(name, address, port)
 }
 
 func (s *System) AddConnection(id string, conn models.Connection) error {
@@ -90,7 +146,13 @@ func (s *System) updateConnectionStatus(id string, isOnline bool) {
 
 func (s *System) RequestConnection(name string, address string, port string) {
 	// Monta a mensagem de conexão
+	messageId, err := models.NewMessageIdString()
+	if err != nil {
+		log.Printf("Error generating message ID: %v", err)
+		return
+	}
 	message := models.Message{
+		Id:   messageId,
 		From: s.ServerId.String(),
 		To:   "", // Destinatário ainda desconhecido
 		Body: map[string]interface{}{
@@ -108,7 +170,7 @@ func (s *System) RequestConnection(name string, address string, port string) {
 	}
 
 	// Cria a URL com endereço e porta do destino
-	url := fmt.Sprintf("%s%s:%s/connect", urlPrefix, address, port)
+	url := fmt.Sprintf("%s%s:%s/connect", URLPREFIX, address, port)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating connection request: %v", err)

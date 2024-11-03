@@ -14,7 +14,7 @@ const Flights = ({ flights, addToCart }) => {
           <div className="flight" key={f.ID}>
             <div className="row">
               <b className="flight-route">
-                {f.OriginAirport.City.CityName} =&gt; {f.DestinationAirport.City.CityName}
+                {f.OriginAirport.City.Name} =&gt; {f.DestinationAirport.City.Name}
               </b>
               <img src={imgUrl} className='company-brand' width={"50px"} />
             </div>

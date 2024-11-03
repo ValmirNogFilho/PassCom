@@ -33,14 +33,14 @@ type System struct {
 }
 
 const (
-	serverName        = "giro"
-	port              = ":9999"
+	SERVERNAME        = "giro"
+	PORT              = "9999"
 	cliPort           = ":7772"
-	bufferSize        = 100
-	connectionTimeout = 10 * time.Second
-	heartbeatTimer    = 1 * time.Second
-	sessionTimeLimit  = 30 * time.Minute
-	urlPrefix         = "http://"
+	BUFFERSIZE        = 100
+	CONNECTIONTIMEOUT = 10 * time.Second
+	HEARTBEATTIMER    = 1 * time.Second
+	SESSIONTIMELIMIT  = 30 * time.Minute
+	URLPREFIX         = "http://"
 	EQUAL             = iota
 	CONCURRENT
 	NEWER
@@ -55,11 +55,11 @@ var (
 func GetInstance() *System {
 	once.Do(func() {
 		instance = &System{
-			ServerName:  serverName,
+			ServerName:  SERVERNAME,
 			ServerId:    uuid.New(),
 			Address:     getLocalIP(),
-			Port:        port,
-			Buffer:      make(chan models.Message, bufferSize),
+			Port:        getPort(),
+			Buffer:      make(chan models.Message, BUFFERSIZE),
 			VectorClock: make(map[string]int),
 			Connections: make(map[string]models.Connection),
 			shutdown:    make(chan os.Signal, 1),
@@ -73,7 +73,7 @@ func GetInstance() *System {
 func (s *System) StartServer() error {
 	signal.Notify(s.shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	go s.CleanupSessions(sessionTimeLimit)
+	go s.CleanupSessions(SESSIONTIMELIMIT)
 
 	// Usam requests dos clientes
 	http.HandleFunc("/login", handleLogin)
@@ -89,11 +89,12 @@ func (s *System) StartServer() error {
 	// Usam messages dos servidores
 	http.HandleFunc("/heartbeat", s.handleHeartbeat)
 	http.HandleFunc("/connect", s.handleConnect)
+	http.HandleFunc("/request/connect", s.handleRequestConnection)
 
 	server := &http.Server{
-		Addr:         s.Address + s.Port,
-		ReadTimeout:  connectionTimeout,
-		WriteTimeout: connectionTimeout,
+		Addr:         s.Address + ":" + s.Port,
+		ReadTimeout:  CONNECTIONTIMEOUT,
+		WriteTimeout: CONNECTIONTIMEOUT,
 	}
 
 	log.Println("HTTP Server listening on", server.Addr)

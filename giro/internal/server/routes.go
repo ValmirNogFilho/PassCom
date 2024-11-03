@@ -182,8 +182,8 @@ func getRoute(flightIds []uint) ([]map[string]interface{}, error) {
 		fmt.Println(flight.OriginAirport)
 
 		flightresponse["Seats"] = flight.Seats
-		flightresponse["Src"] = flight.OriginAirport.City.CityName
-		flightresponse["Dest"] = flight.DestinationAirport.City.CityName
+		flightresponse["Src"] = flight.OriginAirport.City.Name
+		flightresponse["Dest"] = flight.DestinationAirport.City.Name
 		responseData[i] = flightresponse
 	}
 	return responseData, nil
