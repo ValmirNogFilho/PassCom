@@ -93,7 +93,7 @@ func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 	}
 
 	// Construir a URL com endereço e porta
-	url := fmt.Sprintf("%s%s:%s/heartbeat", urlPrefix, conn.Address, conn.Port)
+	url := fmt.Sprintf("%s%s:%s/heartbeat", URLPREFIX, conn.Address, conn.Port)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating heartbeat request: %v", err)

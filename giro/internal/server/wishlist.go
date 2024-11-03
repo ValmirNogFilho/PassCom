@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"giro/internal/dao"
 	"giro/internal/models"
+	"log"
 	"net/http"
 )
 
@@ -35,14 +36,20 @@ func DeleteFromWishlist(id uint, req models.Request) models.Response {
 
 	for i, w := range session.Wishlist {
 		if w.ID == id {
-
-			session.Wishlist[i] = session.Wishlist[len(session.Wishlist)-1]
-			session.Wishlist = session.Wishlist[:len(session.Wishlist)-1]
+			// Remover preservando a ordem
+			session.Wishlist = append(session.Wishlist[:i], session.Wishlist[i+1:]...)
 			break
 		}
 	}
 
-	dao.GetSessionDAO().Update(session)
+	if err := dao.GetSessionDAO().Update(session); err != nil {
+		log.Printf("Failed to update session: %v", err)
+		return models.Response{
+			Error:  "failed to update session",
+			Status: http.StatusInternalServerError,
+		}
+	}
+
 	return models.Response{
 		Data: map[string]interface{}{
 			"msg": "wish deleted",

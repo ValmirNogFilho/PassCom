@@ -46,7 +46,7 @@ const BrazilMap = ({capitals, flights}) => {
                         key={capital.name}
                         position={[capital.City.Latitude, capital.City.Longitude]}
                         eventHandlers={{
-                            click: () => selectCity(capital.City.CityName),
+                            click: () => selectCity(capital.City.Name),
                         }}
                     >
                         <Popup key={capital.Name}>

@@ -2,7 +2,7 @@
   {
     "Name": "Aeroporto Internacional de Rio Branco",
     "City": {
-      "CityName": "Rio Branco",
+      "Name": "Rio Branco",
       "State": "AC",
       "Country": "Brasil",
       "Latitude": -9.9767,
@@ -12,7 +12,7 @@
   {
     "Name": "Aeroporto Internacional de Maceió",
     "City": {
-      "CityName": "Maceió",
+      "Name": "Maceió",
       "State": "AL",
       "Country": "Brasil",
       "Latitude": -9.6658,
@@ -22,7 +22,7 @@
   {
     "Name": "Aeroporto Internacional de Manaus",
     "City": {
-      "CityName": "Manaus",
+      "Name": "Manaus",
       "State": "AM",
       "Country": "Brasil",
       "Latitude": -3.1190,
@@ -32,7 +32,7 @@
   {
     "Name": "Aeroporto Internacional de Macapá",
     "City": {
-      "CityName": "Macapá",
+      "Name": "Macapá",
       "State": "AP",
       "Country": "Brasil",
       "Latitude": 0.0341,
@@ -42,7 +42,7 @@
   {
     "Name": "Aeroporto Internacional de Salvador",
     "City": {
-      "CityName": "Salvador",
+      "Name": "Salvador",
       "State": "BA",
       "Country": "Brasil",
       "Latitude": -12.9714,
@@ -52,7 +52,7 @@
   {
     "Name": "Aeroporto Internacional de Fortaleza",
     "City": {
-      "CityName": "Fortaleza",
+      "Name": "Fortaleza",
       "State": "CE",
       "Country": "Brasil",
       "Latitude": -3.7172,
@@ -62,7 +62,7 @@
   {
     "Name": "Aeroporto Internacional de Brasília",
     "City": {
-      "CityName": "Brasília",
+      "Name": "Brasília",
       "State": "DF",
       "Country": "Brasil",
       "Latitude": -15.7801,
@@ -72,7 +72,7 @@
   {
     "Name": "Aeroporto Internacional de Vitória",
     "City": {
-      "CityName": "Vitória",
+      "Name": "Vitória",
       "State": "ES",
       "Country": "Brasil",
       "Latitude": -20.3155,
@@ -82,7 +82,7 @@
   {
     "Name": "Aeroporto Internacional de Goiânia",
     "City": {
-      "CityName": "Goiânia",
+      "Name": "Goiânia",
       "State": "GO",
       "Country": "Brasil",
       "Latitude": -16.6786,
@@ -92,7 +92,7 @@
   {
     "Name": "Aeroporto Internacional de São Luís",
     "City": {
-      "CityName": "São Luís",
+      "Name": "São Luís",
       "State": "MA",
       "Country": "Brasil",
       "Latitude": -2.5489,
@@ -102,7 +102,7 @@
   {
     "Name": "Aeroporto Internacional de Belo Horizonte",
     "City": {
-      "CityName": "Belo Horizonte",
+      "Name": "Belo Horizonte",
       "State": "MG",
       "Country": "Brasil",
       "Latitude": -19.8157,
@@ -112,7 +112,7 @@
   {
     "Name": "Aeroporto Internacional de Campo Grande",
     "City": {
-      "CityName": "Campo Grande",
+      "Name": "Campo Grande",
       "State": "MS",
       "Country": "Brasil",
       "Latitude": -20.4428,
@@ -122,7 +122,7 @@
   {
     "Name": "Aeroporto Internacional de Cuiabá",
     "City": {
-      "CityName": "Cuiabá",
+      "Name": "Cuiabá",
       "State": "MT",
       "Country": "Brasil",
       "Latitude": -15.5983,
@@ -132,7 +132,7 @@
   {
     "Name": "Aeroporto Internacional de Belém",
     "City": {
-      "CityName": "Belém",
+      "Name": "Belém",
       "State": "PA",
       "Country": "Brasil",
       "Latitude": -1.4553,
@@ -142,7 +142,7 @@
   {
     "Name": "Aeroporto Internacional de João Pessoa",
     "City": {
-      "CityName": "João Pessoa",
+      "Name": "João Pessoa",
       "State": "PB",
       "Country": "Brasil",
       "Latitude": -7.1155,
@@ -152,7 +152,7 @@
   {
     "Name": "Aeroporto Internacional de Curitiba",
     "City": {
-      "CityName": "Curitiba",
+      "Name": "Curitiba",
       "State": "PR",
       "Country": "Brasil",
       "Latitude": -25.4284,
@@ -162,7 +162,7 @@
   {
     "Name": "Aeroporto Internacional de Recife",
     "City": {
-      "CityName": "Recife",
+      "Name": "Recife",
       "State": "PE",
       "Country": "Brasil",
       "Latitude": -8.0476,
@@ -172,7 +172,7 @@
   {
     "Name": "Aeroporto Internacional de Teresina",
     "City": {
-      "CityName": "Teresina",
+      "Name": "Teresina",
       "State": "PI",
       "Country": "Brasil",
       "Latitude": -5.0919,
@@ -182,7 +182,7 @@
   {
     "Name": "Aeroporto Internacional do Rio de Janeiro",
     "City": {
-      "CityName": "Rio de Janeiro",
+      "Name": "Rio de Janeiro",
       "State": "RJ",
       "Country": "Brasil",
       "Latitude": -22.9068,
@@ -192,7 +192,7 @@
   {
     "Name": "Aeroporto Internacional de Natal",
     "City": {
-      "CityName": "Natal",
+      "Name": "Natal",
       "State": "RN",
       "Country": "Brasil",
       "Latitude": -5.7945,
@@ -202,7 +202,7 @@
   {
     "Name": "Aeroporto Internacional de Porto Alegre",
     "City": {
-      "CityName": "Porto Alegre",
+      "Name": "Porto Alegre",
       "State": "RS",
       "Country": "Brasil",
       "Latitude": -30.0346,
@@ -212,7 +212,7 @@
   {
     "Name": "Aeroporto Internacional de Porto Velho",
     "City": {
-      "CityName": "Porto Velho",
+      "Name": "Porto Velho",
       "State": "RO",
       "Country": "Brasil",
       "Latitude": -8.7618,
@@ -222,7 +222,7 @@
   {
     "Name": "Aeroporto Internacional de Boa Vista",
     "City": {
-      "CityName": "Boa Vista",
+      "Name": "Boa Vista",
       "State": "RR",
       "Country": "Brasil",
       "Latitude": 2.8231,
@@ -232,7 +232,7 @@
   {
     "Name": "Aeroporto Internacional de Florianópolis",
     "City": {
-      "CityName": "Florianópolis",
+      "Name": "Florianópolis",
       "State": "SC",
       "Country": "Brasil",
       "Latitude": -27.5954,
@@ -242,7 +242,7 @@
   {
     "Name": "Aeroporto Internacional de São Paulo",
     "City": {
-      "CityName": "São Paulo",
+      "Name": "São Paulo",
       "State": "SP",
       "Country": "Brasil",
       "Latitude": -23.5505,
@@ -252,7 +252,7 @@
   {
     "Name": "Aeroporto Internacional de Aracaju",
     "City": {
-      "CityName": "Aracaju",
+      "Name": "Aracaju",
       "State": "SE",
       "Country": "Brasil",
       "Latitude": -10.9472,
@@ -262,7 +262,7 @@
   {
     "Name": "Aeroporto Internacional de Palmas",
     "City": {
-      "CityName": "Palmas",
+      "Name": "Palmas",
       "State": "TO",
       "Country": "Brasil",
       "Latitude": -10.1664,

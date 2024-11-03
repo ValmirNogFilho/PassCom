@@ -29,7 +29,7 @@ const SelectBoxes = ({ airports, srcValue, setSrcValue, destValue, setDestValue}
                     </option>
                     {airports.map((airport, i) => (
                         <option key={i} value={airport.Name}>
-                            {airport.City.CityName}
+                            {airport.City.Name}
                         </option>
                     ))}
                 </select>
@@ -54,7 +54,7 @@ const SelectBoxes = ({ airports, srcValue, setSrcValue, destValue, setDestValue}
                     </option>
                     {airports.map((airport, i) => (
                         <option key={i} value={airport.Name}>
-                            {airport.City.CityName}
+                            {airport.City.Name}
                         </option>
                     ))}
                 </select>

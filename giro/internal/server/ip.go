@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net"
+	"os"
 )
 
 func getLocalIP() string {
@@ -19,4 +20,16 @@ func getLocalIP() string {
 		}
 	}
 	return "127.0.0.1"
+}
+
+func getPort() string {
+	// Tenta obter a porta da variável de ambiente PORT
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = PORT // Porta padrão se a variável não estiver definida
+		log.Printf("PORT environment variable not set. Using default port: %s", port)
+	} else {
+		log.Printf("Using port from environment variable PORT: %s", port)
+	}
+	return port
 }

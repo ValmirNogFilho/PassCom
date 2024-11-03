@@ -3,7 +3,7 @@ services:
   giro:
     build:
       context: ./giro
-    container_name: giro
+    container_name: giro-1
     ports:
       - "9999:9999"
     volumes:
@@ -11,13 +11,16 @@ services:
       - ./giro/database.db:/app/database.db
     networks:
       - passcom
+    environment:
+      - PORT=9999
     command: ["./app"]
 
   giro_ui:
     build:
       context: ./giro/ui
+    container_name: giro-ui-1
     ports:
-      - "5173:5173"
+      - "5172:5172"
     networks:
       - passcom
     depends_on:
