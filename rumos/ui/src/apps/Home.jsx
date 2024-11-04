@@ -6,8 +6,21 @@ import { apiService } from '../axios'
 import Container from '../components/Container'
 
 const Home = () => {
+  const [cartItemCount, setCartItemCount] = useState(0)
   const [airports, setAirports] = useState([])
   const [name, setName] = useState("")
+  const [srcValue, setSrcValue] = useState("Origem")
+  const [destValue, setDestValue] = useState("Destino")
+  const [flights, setFlights] = useState([])
+
+  const addToCart = async (ID) => {
+    try {
+      const res = await apiService.addToWishlist({ FlightId: ID })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     const fetchCapitals = async () => {
       try {
@@ -20,7 +33,7 @@ const Home = () => {
     const fetchName = async () => {
       try {
         const res = await apiService.getUser()
-        const name = `, ${res.data.Data.user.Name}` 
+        const name = `, ${res.data.Data.user.Name}`
         setName(name)
       } catch (error) {
         console.error(error)
@@ -29,6 +42,25 @@ const Home = () => {
     fetchCapitals()
     fetchName()
   }, [])
+
+  const fetchFlights = async () => {
+    try {
+      const res = await apiService.getRoute({
+        src: srcValue,
+        dest: destValue,
+      });
+      setFlights(res.data.Data.paths);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (srcValue !== "Origem" && destValue !== "Destino") {
+      fetchFlights();
+    }
+  }, [srcValue, destValue]);
+
 
   return (
     <div className="home">
@@ -40,11 +72,13 @@ const Home = () => {
       <div className="content">
 
         <div className="map">
-          <BrazilMap capitals={airports} />
+          <BrazilMap capitals={airports} flights={flights} />
         </div>
         <div className="search">
-          <SelectBoxes airports={airports} />
-          <Container />
+          <SelectBoxes airports={airports} srcValue={srcValue}
+            destValue={destValue} setSrcValue={setSrcValue} setDestValue={setDestValue} />
+          <Container flights={flights} addToCart={addToCart} 
+          cartItemCount={cartItemCount} setCartItemCount={setCartItemCount} />
         </div>
       </div>
     </div>

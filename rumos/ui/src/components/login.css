@@ -20,9 +20,9 @@
 }
 
 .login {
-    background-color: #bd0000;
+    background-color: var(--theme);
     opacity: 0.8;
-    background-image: linear-gradient(30deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(150deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(30deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(150deg, #f75245 12%, transparent 12.5%, transparent 87%, #f75245 87.5%, #f75245), linear-gradient(60deg, #f7524577 25%, transparent 25.5%, transparent 75%, #f7524577 75%, #f7524577), linear-gradient(60deg, #f7524577 25%, transparent 25.5%, transparent 75%, #f7524577 75%, #f7524577);
+    background-image: linear-gradient(30deg, #bb5853 12%, transparent 12.5%, transparent 87%, #bb5853 87.5%, #bb5853), linear-gradient(150deg, #bb5853 12%, transparent 12.5%, transparent 87%, #bb5853 87.5%, #bb5853), linear-gradient(30deg, #bb5853 12%, transparent 12.5%, transparent 87%, #bb5853 87.5%, #bb5853), linear-gradient(150deg, #bb5853 12%, transparent 12.5%, transparent 87%, #bb5853 87.5%, #bb5853), linear-gradient(60deg, #bb585377 25%, transparent 25.5%, transparent 75%, #bb585377 75%, #bb585377), linear-gradient(60deg, #bb585377 25%, transparent 25.5%, transparent 75%, #bb585377 75%, #bb585377);
     background-size: 50px 88px;
     background-position: 0 0, 0 0, 25px 44px, 25px 44px, 0 0, 25px 44px;
 
@@ -44,8 +44,7 @@
 }
 
 .disabled {
-    /* background: #ccc; */
-    background-color: rgba(189, 0, 0, 0.3);
+    background-color: #ccc;
 }
 
 .login-input {
@@ -67,7 +66,7 @@
 }
 
 .button:not(.disabled):hover {
-    background-color: #8a0000;
+    background-color: #680707;
 }
 
 .advice {
@@ -76,7 +75,8 @@
     margin: 0;
 }
 
-.login-input, .button {
+.login-input,
+.button {
     font-size: large;
     height: 3rem;
     width: 70%;

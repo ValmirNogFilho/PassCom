@@ -5,30 +5,35 @@ import cart from "../assets/cart.svg"
 import ticket from "../assets/ticket.svg"
 import Flights from './Flights'
 import Tickets from './Tickets'
-const Container = () => {
+import Cart from './Cart'
+const Container = ({ flights, addToCart, cartItemCount, setCartItemCount }) => {
     const [page, setPage] = useState(0)
     return (
         <div className="route">
             <div className="route-content">
                 {page === 0 ?
-                    <Flights /> :
-                page === 1 ? 
-                <div></div> :
-                <Tickets />
+                    <Flights flights={flights} addToCart={addToCart}
+                        setCartItemCount={setCartItemCount} /> :
+                    page === 1 ?
+                        <Cart setCartItemCount={setCartItemCount} /> :
+                        <Tickets />
                 }
             </div>
             <menu>
-                <div className="flight icon" onClick={() => setPage(0)}
-                    style={{backgroundColor: page===0?"#bd1616":"transparent"}}>
+                <div className="flight-icon icon" onClick={() => setPage(0)}
+                    style={{ backgroundColor: page === 0 ? "#bb5853" : "transparent" }}>
                     <img src={src} alt="" />
                 </div>
-                <div className="cart icon" onClick={() => setPage(1)}
-                    style={{backgroundColor: page===1?"#bd1616":"transparent"}}>
+                <div className="cart-icon icon" onClick={() => setPage(1)}
+                    style={{ backgroundColor: page === 1 ? "#bb5853" : "transparent" }}>
                     <img src={cart} alt="" />
+                    {cartItemCount > 0 && (
+                        <span className="badge">{cartItemCount}</span>
+                    )}
                 </div>
-                <div className="ticket icon" onClick={() => setPage(2)}
-                    style={{backgroundColor: page===2?"#bd1616":"transparent"}}>
-                    <img src={ticket} alt="" />                     
+                <div className="ticket-icon icon" onClick={() => setPage(2)}
+                    style={{ backgroundColor: page === 2 ? "#bb5853" : "transparent" }}>
+                    <img src={ticket} alt="" />
                 </div>
             </menu>
         </div>
