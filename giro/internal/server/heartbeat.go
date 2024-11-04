@@ -63,12 +63,12 @@ func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 
 	client := &http.Client{Timeout: 3 * time.Second} // Define timeout para a resposta
 
-	log.Printf("Sending heartbeat to %s", id)
+	log.Printf("Sending heartbeat to %s", s.Connections[id].Name)
 	resp, err := client.Do(req)
 
 	// Verifica se houve erro na resposta ou se o servidor está offline
 	if err != nil || resp.StatusCode != http.StatusOK {
-		log.Printf("Connection %s is offline", id)
+		log.Printf("Connection %s is offline", s.Connections[id].Name)
 		s.updateConnectionStatus(id, false)
 	} else {
 		s.updateConnectionStatus(id, true)

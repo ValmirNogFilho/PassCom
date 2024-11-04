@@ -7,6 +7,7 @@ import (
 type Flight struct {
 	gorm.Model
 	Company              string
+	UniqueId             string
 	Price                uint
 	OriginAirportID      uint    `gorm:"not null"`
 	OriginAirport        Airport `gorm:"foreignKey:OriginAirportID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`

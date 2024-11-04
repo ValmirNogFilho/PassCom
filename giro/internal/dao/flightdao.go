@@ -155,6 +155,44 @@ func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) ([]models.Fl
 	return flights, nil
 }
 
+func (dao *DBFlightDAO) FindByCompany(company string) ([]models.Flight, error) {
+	db, err := utils.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	var flights []models.Flight
+	if err := db.Preload("OriginAirport").
+		Preload("DestinationAirport").
+		Preload("Tickets").
+		Where("company = ?", company).
+		Find(&flights).Error; err != nil {
+		log.Println("Error finding flights by company:", err)
+		return nil, err
+	}
+
+	log.Printf("Flights found for company %s: %v", company, flights)
+	return flights, nil
+}
+
+func (dao *DBFlightDAO) DeleteByCompany(company string) error {
+	db, err := utils.OpenDb()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	if err := db.Where("company =?", company).Delete(&models.Flight{}).Error; err != nil {
+		log.Println("Error deleting flights by company:", err)
+		return err
+	}
+
+	log.Printf("Flights deleted for company %s", company)
+	return nil
+}
+
 func (dao *DBFlightDAO) DeleteAll() {
 
 	db, err := utils.OpenDb()

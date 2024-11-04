@@ -15,6 +15,8 @@ type FlightDAO interface {
 	FindById(uint) (*models.Flight, error)
 	FindBySource(uint) ([]models.Flight, error)
 	FindBySourceAndDest(uint, uint) ([]models.Flight, error)
+	FindByCompany(string) ([]models.Flight, error)
+	DeleteByCompany(string) error
 	DeleteAll()
 	New()
 }

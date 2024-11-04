@@ -2,12 +2,11 @@ package server
 
 import (
 	"encoding/json"
+	"giro/internal/dao"
 	"giro/internal/models"
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/google/uuid"
 )
 
 // allowCrossOrigin is a middleware function that handles Cross-Origin Resource Sharing (CORS)
@@ -429,10 +428,11 @@ func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
 		log.Printf("New connection from %s: %s:%s", message.From, address, port)
 
 		// Monta a resposta como models.Message contendo o novo models.Connection
-		responseMessage := models.Message{
-			From: s.ServerId.String(),
-			To:   message.From,
-			Body: newConnection,
+		responseMessage, err := models.CreateMessage(s.ServerId.String(), message.From, s.VectorClock, map[string]interface{}{"Name": s.ServerName})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		// Define o cabeçalho Content-Type e envia o JSON da resposta
@@ -481,18 +481,17 @@ func (s *System) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
 	// Incrementa o relógio do sistema para indicar que o heartbeat foi recebido
 	s.IncrementClock()
 
-	log.Print("Received heartbeat from ", receivedMessage.From, "with VectorClock: ", receivedMessage.VectorClock)
+	log.Print("Received heartbeat from ", s.Connections[receivedMessage.From].Name)
 
 	// Atualiza o VectorClock com base no *heartbeat* recebido
 	s.UpdateClock(receivedMessage.VectorClock)
 
 	// Cria uma nova mensagem de resposta com o VectorClock atualizado
-	responseMessage := models.Message{
-		Id:          uuid.New().String(),
-		From:        s.ServerId.String(),
-		To:          receivedMessage.From,
-		VectorClock: s.VectorClock,
-		Body:        "Healthy",
+	responseMessage, err := models.CreateMessage(s.ServerId.String(), receivedMessage.From, s.VectorClock, "Healthy")
+
+	if err != nil {
+		log.Printf("Error creating heartbeat response message: %v", err)
+		return
 	}
 
 	// Codifica a mensagem de resposta como JSON
@@ -500,56 +499,25 @@ func (s *System) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error encoding heartbeat response: %v", err)
 	}
 
-	log.Print("Sent heartbeat response to ", receivedMessage.From)
+	log.Print("Sent heartbeat response to ", s.Connections[receivedMessage.From].Name)
 }
 
-func (s *System) handleRequestConnection(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
+func (s *System) handleDatabase(w http.ResponseWriter, r *http.Request) {
+	// Define o tipo de resposta como JSON e status OK
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
-	var message models.Message
-	err := json.NewDecoder(r.Body).Decode(&message)
+	// Usa o DAO para buscar todos os voos cujo campo Company é igual a s.ServerName
+	flights, err := dao.GetFlightDAO().FindByCompany(s.ServerName)
 	if err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		http.Error(w, "Failed to retrieve flights", http.StatusInternalServerError)
+		log.Printf("Error retrieving flights from database: %v", err)
 		return
 	}
 
-	// Decodifica Body para map[string]interface{} para acessar Address e Port
-	body, ok := message.Body.(map[string]interface{})
-	if !ok {
-		http.Error(w, "Invalid body format", http.StatusBadRequest)
-		return
+	// Codifica a lista de voos como JSON e envia na resposta
+	if err := json.NewEncoder(w).Encode(flights); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		log.Printf("Error encoding flights to JSON: %v", err)
 	}
-
-	name, ok := body["Name"].(string)
-	if !ok {
-		http.Error(w, "Invalid name format", http.StatusBadRequest)
-		return
-	}
-
-	address, ok := body["Address"].(string)
-	if !ok {
-		http.Error(w, "Invalid Address format", http.StatusBadRequest)
-		return
-	}
-
-	port, ok := body["Port"].(string)
-	if !ok {
-		http.Error(w, "Invalid Port format", http.StatusBadRequest)
-		return
-	}
-
-	// Monta a URL de solicitação de conexão
-	switch r.Method {
-	case http.MethodPost:
-		// Solicita a conexão com um novo server
-		s.RequestConnection(name, address, port)
-
-	case http.MethodDelete:
-		// Solicita a desconexão do server com base em message.From
-		s.RequestDisconnection(address, port)
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	s.RequestConnection(name, address, port)
 }

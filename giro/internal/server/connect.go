@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"giro/internal/models"
 	"log"
 	"net/http"
@@ -35,22 +34,16 @@ func (s *System) updateConnectionStatus(id string, isOnline bool) {
 	}
 }
 
-func (s *System) RequestConnection(name string, address string, port string) {
-	// Monta a mensagem de conexão
-	messageId, err := models.NewMessageIdString()
+func (s *System) RequestConnection(address string, port string) {
+	message, err := models.CreateMessage(s.ServerId.String(), "", s.VectorClock, map[string]interface{}{
+		"Name":    s.ServerName,
+		"Address": s.ServerName, // TODO: corrigir depois, pois assim está usando o mesmo nome do container
+		"Port":    s.Port,
+	})
+
 	if err != nil {
-		log.Printf("Error generating message ID: %v", err)
+		log.Printf("Error creating connection request message: %v", err)
 		return
-	}
-	message := models.Message{
-		Id:   messageId,
-		From: s.ServerId.String(),
-		To:   "", // Destinatário ainda desconhecido
-		Body: map[string]interface{}{
-			"Name":    s.ServerName,
-			"Address": s.Address,
-			"Port":    s.Port,
-		},
 	}
 
 	// Serializa a mensagem em JSON
@@ -60,9 +53,11 @@ func (s *System) RequestConnection(name string, address string, port string) {
 		return
 	}
 
+	url := URL_PREFIX + address + ":" + port
+
+	log.Print("url being used is: ", url)
 	// Cria a URL com endereço e porta do destino
-	url := fmt.Sprintf("%s%s:%s/server/connect", URL_PREFIX, address, port)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", url+"/server/connect", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating connection request: %v", err)
 		return
@@ -72,14 +67,14 @@ func (s *System) RequestConnection(name string, address string, port string) {
 	// Realiza a solicitação ao destino
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("Error connecting to %s:%s: %v", address, port, err)
+		log.Printf("Error connecting to %s: %v", url, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	// Verifica o status da resposta
 	if resp.StatusCode != http.StatusCreated {
-		log.Printf("Failed to connect to %s:%s - status: %s", address, port, resp.Status)
+		log.Printf("Failed to connect to %s - status: %s", url, resp.Status)
 		return
 	}
 
@@ -97,29 +92,17 @@ func (s *System) RequestConnection(name string, address string, port string) {
 		return
 	}
 
-	updatedName, ok := body["Name"].(string)
+	name, ok := body["Name"].(string)
 	if !ok {
 		log.Printf("Invalid name format in connection response")
 		return
 	}
 
-	updatedAddress, ok := body["Address"].(string)
-	if !ok {
-		log.Printf("Invalid address format in connection response")
-		return
-	}
-
-	updatedPort, ok := body["Port"].(string)
-	if !ok {
-		log.Printf("Invalid port format in connection response")
-		return
-	}
-
 	// Atualiza o destinatário com o ID do servidor recebido na resposta
 	newConnection := models.Connection{
-		Name:     updatedName,
-		Address:  updatedAddress,
-		Port:     updatedPort,
+		Name:     name,
+		Address:  address,
+		Port:     port,
 		IsOnline: true,
 	}
 
@@ -128,57 +111,5 @@ func (s *System) RequestConnection(name string, address string, port string) {
 	s.Connections[responseMessage.From] = newConnection
 	s.Lock.Unlock()
 
-	log.Printf("Successfully connected to server %s at %s:%s", responseMessage.From, address, port)
-}
-
-func (s *System) RequestDisconnection(address string, port string) {
-	// Monta a mensagem de desconexão
-	messageId, err := models.NewMessageIdString()
-	if err != nil {
-		log.Printf("Error generating message ID: %v", err)
-		return
-	}
-
-	// Cria a mensagem de desconexão com o ID do servidor local
-	message := models.Message{
-		Id:   messageId,
-		From: s.ServerId.String(),
-		Body: map[string]interface{}{
-			"Name":    s.ServerName,
-			"Address": s.Address,
-			"Port":    s.Port,
-		},
-	}
-
-	// Serializa a mensagem em JSON
-	jsonData, err := json.Marshal(message)
-	if err != nil {
-		log.Printf("Error encoding disconnection request message: %v", err)
-		return
-	}
-
-	// Cria a URL com o endereço e porta do servidor remoto
-	url := fmt.Sprintf("%s%s:%s/server/connect", URL_PREFIX, address, port)
-	req, err := http.NewRequest("DELETE", url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Printf("Error creating disconnection request: %v", err)
-		return
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	// Envia a solicitação de desconexão ao servidor remoto
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Printf("Error disconnecting from %s:%s: %v", address, port, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	// Verifica o status da resposta
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Failed to disconnect from %s:%s - status: %s", address, port, resp.Status)
-		return
-	}
-
-	log.Printf("Successfully disconnected from server at %s:%s", address, port)
+	log.Printf("Successfully connected to server %s at %s", name, url)
 }

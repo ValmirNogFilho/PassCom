@@ -24,7 +24,8 @@ type System struct {
 	ServerId    uuid.UUID
 	Address     string
 	Port        string
-	Buffer      chan models.Message
+	Log         []models.LogMessage
+	Buffer      chan models.LogMessage
 	VectorClock map[string]int
 	Connections map[string]models.Connection
 	Lock        sync.RWMutex
@@ -34,10 +35,12 @@ type System struct {
 
 const (
 	SERVER_NAME        = "giro"
+	ADDRESS            = "localhost"
 	PORT               = "9999"
 	CLIPORT            = ":7772"
 	INSTANCE_PATH      = "systemvars.json"
 	BUFFER_SIZE        = 100
+	LOG_SIZE           = 1000
 	CONNECTION_TIMEOUT = 10 * time.Second
 	HEARTBEAT_TIMER    = 1 * time.Second
 	SESSION_TIME_LIMIT = 30 * time.Minute
@@ -71,6 +74,7 @@ func (s *System) storeSystemVars(path string) {
 	systemVars["ServerName"] = s.ServerName
 	systemVars["ServerId"] = s.ServerId
 	systemVars["Address"] = s.Address
+	systemVars["Log"] = s.Log
 	systemVars["Port"] = s.Port
 	systemVars["VectorClock"] = s.VectorClock
 	systemVars["Connections"] = s.Connections
@@ -109,7 +113,9 @@ func LoadInstanceFromFile(path string) (*System, error) {
 	}
 
 	// Restaurar canais e mapas, se necessário
-	loadedInstance.Buffer = make(chan models.Message, BUFFER_SIZE)
+	loadedInstance.Address = getLocalIP()
+	loadedInstance.Port = getPort()
+	loadedInstance.Buffer = make(chan models.LogMessage, BUFFER_SIZE)
 	loadedInstance.shutdown = make(chan os.Signal, 1)
 
 	return &loadedInstance, nil
@@ -124,16 +130,17 @@ func GetInstance() *System {
 	once.Do(func() {
 		loadedInstance, err := LoadInstanceFromFile(INSTANCE_PATH)
 		if err == nil {
-			log.Print("Instância carregada de systemvars.json")
+			log.Printf("Server instance loaded from file %v", INSTANCE_PATH)
 			instance = loadedInstance
 		} else {
-			log.Print("Falha ao carregar systemvars.json. Criando nova instância:", err)
+			log.Printf("Failed to load server instance from file %v due to: %v. Creating new instance...", INSTANCE_PATH, err)
 			instance = &System{
 				ServerName:  SERVER_NAME,
 				ServerId:    uuid.New(),
 				Address:     getLocalIP(),
 				Port:        getPort(),
-				Buffer:      make(chan models.Message, BUFFER_SIZE),
+				Log:         make([]models.LogMessage, LOG_SIZE),
+				Buffer:      make(chan models.LogMessage, BUFFER_SIZE),
 				VectorClock: make(map[string]int),
 				Connections: make(map[string]models.Connection),
 				shutdown:    make(chan os.Signal, 1),
@@ -173,7 +180,7 @@ func (s *System) StartServer() error {
 	// Usam messages dos servidores
 	http.HandleFunc("/server/heartbeat", s.handleHeartbeat)
 	http.HandleFunc("/server/connect", s.handleConnect)
-	http.HandleFunc("/server/request/connection", s.handleRequestConnection)
+	http.HandleFunc("/server/database", s.handleDatabase)
 
 	httpServer := &http.Server{
 		Addr:         s.Address + ":" + s.Port,
@@ -284,25 +291,45 @@ func (s *System) handleCLIConnection(conn net.Conn) {
 				[]byte("Available commands:" +
 					"\n- help: to see commands" +
 					"\n- info: to see server informations" +
-					"\n- addconn <server_name> <address> <port>: to add a new connection" +
-					"\n- quit: to close the connection\n"))
+					"\n- addconn <address> <port>: to add a new connection" +
+					"\n- quit: to close the connection" +
+					"\n- shutdown: to shut down the server\n"))
 
 		case "info":
 			conn.Write([]byte(s.getServerInfo()))
 
 		case "addconn":
-			if len(args) < 1 {
-				conn.Write([]byte("Error: 'addconn' requires three arguments (server name, address, port).\n"))
+			if len(args) < 2 {
+				conn.Write([]byte("Error: 'addconn' requires two arguments (address, port).\n"))
 			} else {
-				name := args[0]
-				address := args[1]
-				connPort := args[2]
-				s.RequestConnection(name, address, connPort)
-				conn.Write([]byte("new connection added with port: " + connPort + "\n"))
+				address := args[0]
+				connPort := args[1]
+				s.RequestConnection(address, connPort)
+				conn.Write([]byte("Requesting connection to " + address + ":" + connPort + "...\n"))
+				s.RequestDatabase(address, connPort)
+				conn.Write([]byte("Requesting database from " + address + ":" + connPort + "...\n"))
+			}
+
+		case "rmconn":
+			if len(args) < 1 {
+				conn.Write([]byte("Error: 'rmconn' requires one argument (connection ID).\n"))
+			} else {
+				connId := args[0]
+				s.removeConnection(connId)
+				conn.Write([]byte("Removing connection " + connId + "...\n"))
+				s.RemoveDatabase(connId)
+				conn.Write([]byte("Removing database from " + connId + "...\n"))
 			}
 
 		case "quit":
 			conn.Write([]byte("Closing CLI...\n"))
+			return
+
+		case "shutdown":
+			conn.Write([]byte("Shutting down the server...\n"))
+			go func() {
+				s.shutdown <- syscall.SIGTERM
+			}()
 			return
 
 		default:

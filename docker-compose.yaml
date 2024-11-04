@@ -6,13 +6,16 @@ services:
     container_name: giro-1
     ports:
       - "9999:9999"
+      - "7772:7772"
     volumes:
       - ./giro/internal/stubs:/app/internal/stubs
       - ./giro/database.db:/app/database.db
+      - ./giro/systemvars.json:/app/systemvars.json
     networks:
       - passcom
     environment:
       - PORT=9999
+      - CLIPORT=7772
     command: ["./app"]
 
   giro_ui:
@@ -26,31 +29,35 @@ services:
     depends_on:
       - giro
 
-  # Serviço Rumos
-  # rumos:
+  # boreal:
   #   build:
-  #     context: ./rumos
-  #   container_name: rumos
+  #     context: ./boreal
+  #   container_name: boreal-1
   #   ports:
   #     - "8888:8888"
+  #     - "7771:7771"
   #   volumes:
-  #     - ./rumos/internal/stubs:/app/internal/stubs
-  #     - ./rumos/test.db:/app/test.db
+  #     - ./boreal/internal/stubs:/app/internal/stubs
+  #     - ./boreal/database.db:/app/database.db
+  #     - ./boreal/systemvars.json:/app/systemvars.json
   #   networks:
   #     - passcom
-  #   command: ["./api"]
+  #   environment:
+  #     - PORT=8888
+  #     - CLIPORT=7771
+  #   command: ["./app"]
 
-  # rumos_ui:
+  # boreal_ui:
   #   build:
-  #     context: ./rumos/ui
+  #     context: ./boreal/ui
+  #   container_name: boreal-ui-1
   #   ports:
-  #     - "5173:5173"
+  #     - "5171:5172"
   #   networks:
   #     - passcom
   #   depends_on:
-  #     - rumos
+  #     - boreal
 
 networks:
   passcom:
     driver: bridge
-    external: true
