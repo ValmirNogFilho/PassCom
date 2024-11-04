@@ -63,7 +63,7 @@ func Login(data interface{}) models.Response {
 			dao.GetSessionDAO().Insert(session)
 		}
 
-		token := fmt.Sprintf("%s", session.ID)
+		token := session.ID.String()
 
 		response.Data["token"] = token
 		response.Status = http.StatusOK

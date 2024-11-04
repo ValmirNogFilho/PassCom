@@ -177,7 +177,7 @@ func getRoute(flightIds []uint) ([]map[string]interface{}, error) {
 		flightresponse := make(map[string]interface{})
 		flight, err := dao.GetFlightDAO().FindById(id)
 		if err != nil {
-			return nil, fmt.Errorf("some flight doesn't exist: %s", id)
+			return nil, fmt.Errorf("some flight doesn't exist: %v", id)
 		}
 		fmt.Println(flight.OriginAirport)
 

@@ -1,6 +1,8 @@
 package server
 
-import "log"
+import (
+	"log"
+)
 
 func (s *System) IncrementClock() {
 	s.VectorClock[s.ServerId.String()]++
