@@ -31,17 +31,39 @@ O software assegura a sincronização distribuída a partir do uso de diversos a
 
 # Arquitetura da solução
 
+Stateless
+
 # Protocolo de comunicação
+
+Especifique as APIs de comunicação implementadas entre os componentes desenvolvidos, descrevendo os métodos remotos, parametros e retornos empregados para permitir a compra de passagens entre clientes e servidores, e entre servidores.
+
+HTTP
 
 # Roteamento
 
+Qual o método usado para o cálculo distribuído das rotas entre origem e destino da passagem, e se o sistema consegue mostrar para os usuários todas as rotas possíveis considerando os trechos disponíveis nos servidores de todas as companhias.
+
+Réplicas dos bancos de dados
+
 # Concorrência Distribuída
+
+Especifique conteitualmente a solução empregada para evitar mais vendas de passagens do que a quantidade existente e ou a venda da mesma passagem para clientes distintos.
+
+Broadcast do voo para as réplicas
 
 # Confiabilidade da solução
 
+Desconectando e conectando os servidores das companhias, o sistema continua garantindo a concorrência distribuída e a finalização da compra anteriormente iniciada por um cliente.
+
+Relógios vetoriais
+
 # Avaliação da Solução
 
+Se foi desenvolvido e mantido no Github o código para testar a consistência da solução sob condições críticas e ou avaliar o desempenho do sistema.
+
 # Documentação do código
+
+Se o código do projeto possui comentários explicando as principais classes, e se as funções têm descrições sobre seu propósito, parâmetros, e o retorno esperado.
 
 # Emprego do Docker
 
