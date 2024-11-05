@@ -8,107 +8,11 @@
     "Price": 320
   },
   {
-    "OriginAirportID": 3,
-    "DestinationAirportID": 4,
+    "OriginAirportID": 4,
+    "DestinationAirportID": 5,
     "Passengers": [],
-    "Seats": 120,
-    "Company": "giro",
-    "Price": 290
-  },
-  {
-    "OriginAirportID": 5,
-    "DestinationAirportID": 6,
-    "Passengers": [],
-    "Seats": 180,
-    "Company": "giro",
-    "Price": 410
-  },
-  {
-    "OriginAirportID": 7,
-    "DestinationAirportID": 8,
-    "Passengers": [],
-    "Seats": 200,
-    "Company": "giro",
-    "Price": 360
-  },
-  {
-    "OriginAirportID": 9,
-    "DestinationAirportID": 10,
-    "Passengers": [],
-    "Seats": 145,
-    "Company": "giro",
-    "Price": 275
-  },
-  {
-    "OriginAirportID": 11,
-    "DestinationAirportID": 12,
-    "Passengers": [],
-    "Seats": 160,
-    "Company": "giro",
-    "Price": 325
-  },
-  {
-    "OriginAirportID": 13,
-    "DestinationAirportID": 14,
-    "Passengers": [],
-    "Seats": 130,
-    "Company": "giro",
-    "Price": 285
-  },
-  {
-    "OriginAirportID": 15,
-    "DestinationAirportID": 16,
-    "Passengers": [],
-    "Seats": 155,
-    "Company": "giro",
-    "Price": 310
-  },
-  {
-    "OriginAirportID": 17,
-    "DestinationAirportID": 18,
-    "Passengers": [],
-    "Seats": 170,
-    "Company": "giro",
-    "Price": 335
-  },
-  {
-    "OriginAirportID": 19,
-    "DestinationAirportID": 20,
-    "Passengers": [],
-    "Seats": 140,
-    "Company": "giro",
-    "Price": 295
-  },
-  {
-    "OriginAirportID": 21,
-    "DestinationAirportID": 22,
-    "Passengers": [],
-    "Seats": 165,
-    "Company": "giro",
-    "Price": 320
-  },
-  {
-    "OriginAirportID": 23,
-    "DestinationAirportID": 24,
-    "Passengers": [],
-    "Seats": 150,
+    "Seats": 1,
     "Company": "giro",
     "Price": 300
-  },
-  {
-    "OriginAirportID": 25,
-    "DestinationAirportID": 26,
-    "Passengers": [],
-    "Seats": 175,
-    "Company": "giro",
-    "Price": 340
-  },
-  {
-    "OriginAirportID": 27,
-    "DestinationAirportID": 1,
-    "Passengers": [],
-    "Seats": 190,
-    "Company": "giro",
-    "Price": 355
   }
 ]

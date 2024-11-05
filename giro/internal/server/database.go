@@ -74,7 +74,19 @@ func (s *System) HandlePutDatabase(w http.ResponseWriter, r *http.Request) {
 	}
 
 	to := msg.To
-	flights := msg.Body.([]models.Flight)
+
+	jsonFlights, err := json.Marshal(msg.Body)
+	if err != nil {
+		log.Printf("Error marshalling flight data: %v", err)
+		return
+	}
+
+	var flights []models.Flight
+	err = json.Unmarshal(jsonFlights, &flights)
+	if err != nil {
+		log.Printf("Error unmarshalling flight data: %v", err)
+		return
+	}
 
 	AddFlights(flights)
 
@@ -114,13 +126,26 @@ func (s *System) HandleDeleteDatabase(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, responseMsg, http.StatusOK)
 }
 
-func (s *System) RequestDatabase(address string, port string) {
+func (s *System) RequestDatabase(id string, address string, port string) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 
 	url := URL_PREFIX + address + ":" + port + "/server/database"
 
-	req, err := http.NewRequest("GET", url, nil)
+	requestMsg, err := models.CreateMessage(s.ServerName, id, s.VectorClock, "")
+
+	if err != nil {
+		log.Printf("Error creating database request message: %v", err)
+		return
+	}
+	jsonData, err := json.Marshal(requestMsg)
+
+	if err != nil {
+		log.Printf("Error encoding database request message: %v", err)
+		return
+	}
+
+	req, err := http.NewRequest("GET", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating database request: %v", err)
 		return
@@ -148,13 +173,24 @@ func (s *System) RequestDatabase(address string, port string) {
 		return
 	}
 
-	var flights = msg.Body.([]models.Flight)
+	jsonFlights, err := json.Marshal(msg.Body)
+	if err != nil {
+		log.Printf("Error marshalling flight data: %v", err)
+		return
+	}
+
+	var flights []models.Flight
+	err = json.Unmarshal(jsonFlights, &flights)
+	if err != nil {
+		log.Printf("Error unmarshalling flight data: %v", err)
+		return
+	}
 
 	// Insere ou atualiza cada registro de voo recebido no banco de dados local
 	AddFlights(flights)
 }
 
-func (s *System) SendDatabase(address string, port string) {
+func (s *System) SendDatabase(id string, address string, port string) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 
@@ -167,8 +203,13 @@ func (s *System) SendDatabase(address string, port string) {
 		return
 	}
 
-	// Serializa os dados de voos para JSON
-	jsonData, err := json.Marshal(flights)
+	requestMsg, err := models.CreateMessage(s.ServerName, id, s.VectorClock, flights)
+
+	if err != nil {
+		log.Printf("Error creating database request message: %v", err)
+		return
+	}
+	jsonData, err := json.Marshal(requestMsg)
 	if err != nil {
 		log.Printf("Error encoding flights to JSON: %v", err)
 		return
@@ -204,4 +245,43 @@ func (s *System) RemoveDatabase(company string) {
 	defer s.Lock.Unlock()
 
 	RemoveFlights(company)
+}
+
+func (s *System) RequestDatabaseRemoval(id string, address string, port string) {
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+
+	url := URL_PREFIX + address + ":" + port + "/server/database"
+
+	requestMsg, err := models.CreateMessage(s.ServerName, id, s.VectorClock, "")
+	if err != nil {
+		log.Printf("Error creating database request message: %v", err)
+		return
+	}
+
+	jsonData, err := json.Marshal(requestMsg)
+	if err != nil {
+		log.Printf("Error encoding flights to JSON: %v", err)
+		return
+	}
+
+	req, err := http.NewRequest("DELETE", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Printf("Error creating database send request: %v", err)
+		return
+	}
+
+	// Envia a solicitação ao servidor remoto
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Printf("Error requesting database removal from %s", url)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Verifica o status da resposta
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to remove database from %s", url)
+		return
+	}
 }

@@ -57,12 +57,13 @@ func (s *System) sendHeartbeats() {
 	for {
 		select {
 		case <-ticker.C:
-			s.Lock.RLock()
+			s.Lock.Lock()
+			s.IncrementClock()
 			for id, conn := range s.Connections {
 				s.wg.Add(1)
 				go s.sendHeartbeatToConnection(id, conn)
 			}
-			s.Lock.RUnlock()
+			s.Lock.Unlock()
 		case <-s.shutdown:
 			return
 		}

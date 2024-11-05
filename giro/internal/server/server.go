@@ -178,6 +178,9 @@ func (s *System) StartServer() error {
 	http.HandleFunc("/server/heartbeat", s.handleHeartbeat)
 	http.HandleFunc("/server/connect", s.handleConnect)
 	http.HandleFunc("/server/database", s.handleDatabase)
+	http.HandleFunc("/server/ticket/purchase", s.HandleServerTicketPurchase)
+	http.HandleFunc("/server/ticket/cancel", s.HandleServerTicketCancel)
+	http.HandleFunc("/server/broadcast", s.HandleBroadcast)
 
 	httpServer := &http.Server{
 		Addr:         s.Address + ":" + s.Port,
@@ -220,20 +223,20 @@ func (s *System) StartServer() error {
 // Return:
 // - An error if the server fails to close gracefully. Returns nil if the shutdown is successful.
 func (s *System) shutdownServer(server *http.Server) error {
-    log.Println("Server shutting down...")
+	log.Println("Server shutting down...")
 
-    // Wait for all goroutines to finish
-    s.wg.Wait()
+	// Wait for all goroutines to finish
+	s.wg.Wait()
 
-    // Lock the mutex to ensure atomic access when writing to file
-    s.Lock.Lock()
-    defer s.Lock.Unlock()
+	// Lock the mutex to ensure atomic access when writing to file
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
 
-    // Save the system variables to a file
-    s.storeSystemVars(INSTANCE_PATH)
+	// Save the system variables to a file
+	s.storeSystemVars(INSTANCE_PATH)
 
-    // Close the HTTP server
-    return server.Close()
+	// Close the HTTP server
+	return server.Close()
 }
 
 // getServerInfo returns a formatted string containing information about the server.

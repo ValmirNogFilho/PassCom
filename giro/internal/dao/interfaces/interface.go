@@ -16,6 +16,9 @@ type FlightDAO interface {
 	FindBySource(uint) ([]models.Flight, error)
 	FindBySourceAndDest(uint, uint) ([]models.Flight, error)
 	FindByCompany(string) ([]models.Flight, error)
+	FindByUniqueId(string) (*models.Flight, error)
+	FindPathBFS(uint, uint) ([]models.Flight, error)
+	DeleteByUniqueId(string) error
 	DeleteByCompany(string) error
 	DeleteAll()
 	New()
@@ -57,6 +60,8 @@ type TicketDAO interface {
 	Update(models.Ticket) error
 	Delete(models.Ticket)
 	FindById(uint) (*models.Ticket, error)
+	FindByUniqueId(string) (*models.Ticket, error)
+	DeleteByUniqueId(string) error
 	New()
 }
 

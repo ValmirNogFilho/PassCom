@@ -184,19 +184,30 @@ func BuyTicket(request models.Request) models.Response {
 	flight, _ := dao.GetFlightDAO().FindById(buyTicket.FlightId)
 
 	if flight.Seats > 0 {
-		ticket := models.Ticket{
+		var ticket models.Ticket
+		success := false
+		if flight.Company != instance.ServerName {
+			success = instance.initiateBuy(flight.Company, flight.UniqueId)
+		} else {
+			flight.Seats--
+			dao.GetFlightDAO().Update(*flight)
+			success = true
+			instance.broadcast(*flight)
+		}
+
+		ticket = models.Ticket{
 			ClientId: session.ClientID,
 			FlightId: buyTicket.FlightId,
 		}
 
-		flight.Seats--
-		dao.GetFlightDAO().Update(*flight)
-		dao.GetTicketDAO().Insert(ticket)
-		return models.Response{
-			Data: map[string]interface{}{
-				"msg": "success",
-			},
-			Status: http.StatusOK,
+		if success {
+			dao.GetTicketDAO().Insert(ticket)
+			return models.Response{
+				Data: map[string]interface{}{
+					"msg": "success",
+				},
+				Status: http.StatusOK,
+			}
 		}
 	}
 	return models.Response{
@@ -241,9 +252,19 @@ func CancelBuy(id uint, request models.Request) models.Response {
 
 	flight := ticket.Flight
 
-	flight.Seats++
-	dao.GetFlightDAO().Update(flight)
-	dao.GetTicketDAO().Delete(*ticket)
+	success := false
+	if flight.Company != instance.ServerName {
+		success = instance.initiateCancel(flight.Company, flight.UniqueId)
+	} else {
+		flight.Seats++
+		dao.GetFlightDAO().Update(flight)
+		success = true
+		instance.broadcast(flight)
+	}
+
+	if success {
+		dao.GetTicketDAO().Delete(*ticket)
+	}
 
 	return models.Response{
 		Data: map[string]interface{}{

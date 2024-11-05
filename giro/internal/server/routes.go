@@ -103,7 +103,10 @@ func Route(request models.Request) models.Response {
 	}
 
 	paths, paths_err := dao.GetFlightDAO().FindBySourceAndDest(src.ID, dest.ID)
-	if paths_err != nil {
+	cheapestpath, cherr := dao.GetFlightDAO().FindPathBFS(src.ID, dest.ID)
+	paths = append(paths, cheapestpath...)
+
+	if paths_err != nil && cherr != nil {
 		response.Error = "no route"
 	} else {
 

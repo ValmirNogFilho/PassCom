@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"errors"
 	"giro/internal/models"
 	"giro/internal/utils"
 	"log"
@@ -155,6 +156,63 @@ func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) ([]models.Fl
 	return flights, nil
 }
 
+func (dao *DBFlightDAO) FindPathBFS(source uint, dest uint) ([]models.Flight, error) {
+	db, err := utils.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	var flights []models.Flight
+	if err := db.Preload("OriginAirport").
+		Preload("DestinationAirport").
+		Find(&flights).Error; err != nil {
+		log.Println("Error loading flights:", err)
+		return nil, err
+	}
+
+	graph := make(map[uint][]models.Flight)
+	for _, flight := range flights {
+		graph[flight.OriginAirportID] = append(graph[flight.OriginAirportID], flight)
+	}
+
+	type Node struct {
+		AirportID uint
+		Path      []models.Flight
+	}
+
+	queue := []Node{{AirportID: source, Path: []models.Flight{}}}
+	visited := make(map[uint]bool)
+
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+
+		visited[current.AirportID] = true
+
+		if current.AirportID == dest {
+			return current.Path, nil
+		}
+
+		for _, flight := range graph[current.AirportID] {
+			if visited[flight.DestinationAirportID] || flight.Seats <= 0 {
+				continue
+			}
+
+			newPath := append([]models.Flight{}, current.Path...)
+			newPath = append(newPath, flight)
+
+			queue = append(queue, Node{
+				AirportID: flight.DestinationAirportID,
+				Path:      newPath,
+			})
+		}
+	}
+
+	log.Println("No path found from source to destination")
+	return nil, errors.New("no path found from source to destination")
+}
+
 func (dao *DBFlightDAO) FindByCompany(company string) ([]models.Flight, error) {
 	db, err := utils.OpenDb()
 	if err != nil {
@@ -174,6 +232,46 @@ func (dao *DBFlightDAO) FindByCompany(company string) ([]models.Flight, error) {
 
 	log.Printf("Flights found for company %s: %v", company, flights)
 	return flights, nil
+}
+
+func (dao *DBFlightDAO) FindByUniqueId(uniqueId string) (*models.Flight, error) {
+	db, err := utils.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	var flight models.Flight
+
+	// Busca o voo usando o campo `UniqueId`
+	if err := db.Preload("OriginAirport").
+		Preload("DestinationAirport").
+		Preload("Tickets").
+		Where("unique_id = ?", uniqueId).
+		First(&flight).Error; err != nil {
+		log.Println("Error searching flight by unique ID:", err)
+		return nil, err
+	}
+
+	log.Println("Flight found by unique ID:", flight)
+	return &flight, nil
+}
+
+func (dao *DBFlightDAO) DeleteByUniqueId(uniqueId string) error {
+	db, err := utils.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer utils.CloseDb(db)
+
+	// Exclui o voo com o `UniqueId` especificado
+	if err := db.Where("unique_id = ?", uniqueId).Delete(&models.Flight{}).Error; err != nil {
+		log.Println("Error deleting flight by unique ID:", err)
+		return err
+	}
+
+	log.Printf("Flight with unique ID %s successfully deleted.", uniqueId)
+	return nil
 }
 
 func (dao *DBFlightDAO) DeleteByCompany(company string) error {

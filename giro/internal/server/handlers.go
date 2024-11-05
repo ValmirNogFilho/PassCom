@@ -110,10 +110,15 @@ func (s *System) handleCLIConnection(conn net.Conn) {
 				connPort := args[1]
 				conn.Write([]byte("Requesting connection to " + address + ":" + connPort + "...\n"))
 				s.RequestConnection(address, connPort)
-				conn.Write([]byte("Requesting database from " + address + ":" + connPort + "...\n"))
-				s.RequestDatabase(address, connPort)
-				conn.Write([]byte("Sending database to " + address + ":" + connPort + "...\n"))
-				s.SendDatabase(address, connPort)
+				id, serverConn := s.FindConnectionByName(address)
+				if serverConn == nil {
+					conn.Write([]byte("Connection not found.\n"))
+				} else {
+					conn.Write([]byte("Requesting database from " + address + ":" + connPort + "...\n"))
+					s.RequestDatabase(id, address, connPort)
+					conn.Write([]byte("Sending database to " + address + ":" + connPort + "...\n"))
+					s.SendDatabase(id, address, connPort)
+				}
 			}
 
 		case "rmconn":
@@ -126,6 +131,8 @@ func (s *System) handleCLIConnection(conn net.Conn) {
 					conn.Write([]byte("Connection not found.\n"))
 				} else {
 					name := serverConn.Name
+					conn.Write([]byte("Requesting database removal from " + name + "...\n"))
+					s.RequestDatabaseRemoval(id, serverConn.Address, serverConn.Port)
 					conn.Write([]byte("Requested disconnection from " + serverConn.Address + ":" + serverConn.Port + "...\n"))
 					s.RequestDisconnection(serverConn.Address, serverConn.Port)
 					conn.Write([]byte("Removing connection from " + name + "...\n"))

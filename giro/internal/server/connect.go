@@ -231,7 +231,7 @@ func (s *System) RequestDisconnection(address string, port string) {
 	log.Printf("URL being used for disconnection is: %s", url)
 
 	// Cria a solicitação DELETE
-	req, err := http.NewRequest("DELETE", url+"/server/disconnect", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("DELETE", url+"/server/connect", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating disconnection request: %v", err)
 		return
