@@ -33,7 +33,7 @@ type System struct {
 const (
 	SERVER_NAME        = "rumos"
 	ADDRESS            = "localhost"
-	PORT               = "9999"
+	PORT               = "7777"
 	CLIPORT            = ":7770"
 	INSTANCE_PATH      = "systemvars.json"
 	BUFFER_SIZE        = 100

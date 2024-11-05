@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 
 # Expor a porta que a aplicação vai usar
 EXPOSE 7777
-EXPOSE 5173
+EXPOSE 5171
 
 # Comando para iniciar o aplicativo
 CMD ["./app"]

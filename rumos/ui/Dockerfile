@@ -9,4 +9,4 @@ COPY . .
 
 CMD ["npm", "run", "dev"]
 
-EXPOSE 5172
+EXPOSE 5171

@@ -33,7 +33,7 @@ type System struct {
 const (
 	SERVER_NAME        = "giro"
 	ADDRESS            = "localhost"
-	PORT               = "9999"
+	PORT               = "8888"
 	CLIPORT            = ":7771"
 	INSTANCE_PATH      = "systemvars.json"
 	BUFFER_SIZE        = 100

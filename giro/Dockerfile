@@ -30,8 +30,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Expor a porta que a aplicação vai usar
-EXPOSE 9999
-EXPOSE 5173
+EXPOSE 8888
+EXPOSE 5172
 
 # Comando para iniciar o aplicativo
 CMD ["./app"]
