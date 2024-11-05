@@ -9,10 +9,6 @@ Protocolos e conceitos estudados:
 - Linearização
 - Last Writer Wins (alcancável com relógios vetoriais)
 
-O que será implementado:
-
-- Transação atômica entre servidores
-
 # Resumo
 
 # Introdução
