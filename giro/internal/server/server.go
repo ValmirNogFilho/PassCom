@@ -205,8 +205,12 @@ func (s *System) handleCLIConnection(conn net.Conn) {
 				name := args[0]
 				address := args[1]
 				connPort := args[2]
-				s.RequestConnection(name, address, connPort)
-				conn.Write([]byte("new connection added with port: " + connPort + "\n"))
+				if s.ServerName != name {
+					s.RequestConnection(name, address, connPort)
+					conn.Write([]byte("new connection added with port: " + connPort + "\n"))
+				} else {
+					conn.Write([]byte("self connection not allowed. \n"))
+				}
 			}
 
 		case "quit":
