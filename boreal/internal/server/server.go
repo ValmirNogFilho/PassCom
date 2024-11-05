@@ -34,7 +34,7 @@ const (
 	SERVER_NAME        = "boreal"
 	ADDRESS            = "localhost"
 	PORT               = "9999"
-	CLIPORT            = ":7771"
+	CLIPORT            = ":7772"
 	INSTANCE_PATH      = "systemvars.json"
 	BUFFER_SIZE        = 100
 	LOG_SIZE           = 1000

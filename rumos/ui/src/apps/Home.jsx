@@ -55,11 +55,9 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    if (srcValue !== "Origem" && destValue !== "Destino") {
-      fetchFlights();
-    }
-  }, [srcValue, destValue]);
+  if (srcValue !== "Origem" && destValue !== "Destino") {
+    fetchFlights();
+  }
 
 
   return (

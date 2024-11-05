@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const host = "10.0.0.104";
+const host = "localhost";
 const port = 9999;
 
 const client = axios.create({
