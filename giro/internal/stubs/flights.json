@@ -1,0 +1,18 @@
+[
+  {
+    "OriginAirportID": 1,
+    "DestinationAirportID": 2,
+    "Passengers": [],
+    "Seats": 150,
+    "Company": "giro",
+    "Price": 320
+  },
+  {
+    "OriginAirportID": 4,
+    "DestinationAirportID": 5,
+    "Passengers": [],
+    "Seats": 1,
+    "Company": "giro",
+    "Price": 300
+  }
+]

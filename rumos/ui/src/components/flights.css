@@ -1,0 +1,62 @@
+.flights {
+    height: 100%;
+}
+
+.flight {
+    background-color: white;
+    margin: 1rem;
+    border-radius: 5px;
+    padding: 1rem;
+    font-weight: 300;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    gap: .5rem;
+}
+
+.buy {
+    border: none;
+    padding: .5rem;
+    border-radius: 5px;
+    background-color: #1a8305;
+    color: white;
+    transition: .2s;
+}
+
+.cancel {
+    border: none;
+    padding: .5rem;
+    border-radius: 5px;
+    background-color: #be123c;
+    color: white;
+    transition: .2s;
+}
+
+.row{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.buy:hover {
+    background-color:  rgb(8, 97, 40);
+}
+
+.cancel:hover {
+    background-color:  #68071f;
+}
+
+.cart-icon {
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
