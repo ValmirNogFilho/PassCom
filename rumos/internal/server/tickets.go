@@ -186,9 +186,10 @@ func BuyTicket(request models.Request) models.Response {
 	if flight.Seats > 0 {
 		var ticket models.Ticket
 		success := false
-		if flight.Company != instance.ServerName {
+		id, conn := instance.FindConnectionByName(flight.Company)
+		if flight.Company != instance.ServerName && (id != "" && conn.IsOnline) {
 			success = instance.initiateBuy(flight.Company, flight.UniqueId)
-		} else {
+		} else if flight.Company == instance.ServerName {
 			flight.Seats--
 			dao.GetFlightDAO().Update(*flight)
 			success = true
@@ -253,7 +254,8 @@ func CancelBuy(id uint, request models.Request) models.Response {
 	flight := ticket.Flight
 
 	success := false
-	if flight.Company != instance.ServerName {
+	connId, conn := instance.FindConnectionByName(flight.Company)
+	if flight.Company != instance.ServerName && (connId != "" && conn.IsOnline) {
 		success = instance.initiateCancel(flight.Company, flight.UniqueId)
 	} else {
 		flight.Seats++
