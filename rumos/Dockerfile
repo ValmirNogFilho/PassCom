@@ -25,4 +25,4 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 8888
+EXPOSE 7777
