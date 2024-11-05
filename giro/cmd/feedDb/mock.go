@@ -7,6 +7,8 @@ import (
 	"giro/internal/models"
 	"log"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 func mockAirports() {
@@ -67,6 +69,8 @@ func mockFlights() {
 	flightdao := dao.GetFlightDAO()
 	airportdao := dao.GetAirportDAO()
 	for _, flight := range flights {
+		newId, _ := uuid.NewV7()
+		flight.UniqueId = newId.String()
 		src, _ := airportdao.FindById(flight.OriginAirportID)
 		dest, _ := airportdao.FindById(flight.DestinationAirportID)
 		flight.OriginAirport = *src

@@ -16,14 +16,14 @@ func (s *System) AddConnection(id string, conn models.Connection) error {
 	return nil
 }
 
-func (s *System) removeConnection(id string) {
+func (s *System) RemoveConnection(id string) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 
 	delete(s.Connections, id)
 }
 
-func (s *System) updateConnectionStatus(id string, isOnline bool) {
+func (s *System) UpdateConnectionStatus(id string, isOnline bool) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 
@@ -112,4 +112,74 @@ func (s *System) RequestConnection(address string, port string) {
 	s.Lock.Unlock()
 
 	log.Printf("Successfully connected to server %s at %s", name, url)
+}
+
+func (s *System) RequestDisconnection(address string, port string) {
+	// Cria a mensagem de desconexão
+	message, err := models.CreateMessage(s.ServerId.String(), "", s.VectorClock, map[string]interface{}{
+		"Name":    s.ServerName,
+		"Address": s.ServerName, // Certifique-se de que este campo é o endereço correto do servidor
+		"Port":    s.Port,
+	})
+
+	if err != nil {
+		log.Printf("Error creating disconnection request message: %v", err)
+		return
+	}
+
+	// Serializa a mensagem em JSON
+	jsonData, err := json.Marshal(message)
+	if err != nil {
+		log.Printf("Error encoding disconnection request message: %v", err)
+		return
+	}
+
+	// Cria a URL de desconexão usando o endereço e a porta do servidor de destino
+	url := URL_PREFIX + address + ":" + port
+
+	log.Printf("URL being used for disconnection is: %s", url)
+
+	// Cria a solicitação DELETE
+	req, err := http.NewRequest("DELETE", url+"/server/disconnect", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Printf("Error creating disconnection request: %v", err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Envia a solicitação de desconexão ao servidor de destino
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Printf("Error disconnecting from %s: %v", url, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Verifica o status da resposta para garantir que a desconexão foi bem-sucedida
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to disconnect from %s - status: %s", url, resp.Status)
+		return
+	}
+
+	log.Printf("Successfully disconnected from server at %s", url)
+
+	// Remove a conexão do mapa de conexões do sistema
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+	delete(s.Connections, address)
+}
+
+func (s *System) FindConnectionByName(name string) (string, *models.Connection) {
+	s.Lock.RLock()
+	defer s.Lock.RUnlock()
+
+	for id, conn := range s.Connections {
+		if conn.Name == name {
+			log.Printf("Found connection with address %s: %+v", name, conn)
+			return id, &conn
+		}
+	}
+
+	log.Printf("No connection found with address %s", name)
+	return "", nil
 }

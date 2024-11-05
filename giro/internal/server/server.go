@@ -315,10 +315,18 @@ func (s *System) handleCLIConnection(conn net.Conn) {
 				conn.Write([]byte("Error: 'rmconn' requires one argument (connection ID).\n"))
 			} else {
 				connId := args[0]
-				s.removeConnection(connId)
-				conn.Write([]byte("Removing connection " + connId + "...\n"))
-				s.RemoveDatabase(connId)
-				conn.Write([]byte("Removing database from " + connId + "...\n"))
+				id, serverConn := s.FindConnectionByName(connId)
+				if serverConn == nil {
+					conn.Write([]byte("Connection not found.\n"))
+				} else {
+					name := serverConn.Name
+					s.RequestDisconnection(serverConn.Address, serverConn.Port)
+					conn.Write([]byte("Requested disconnection from " + serverConn.Address + ":" + serverConn.Port + "...\n"))
+					s.RemoveConnection(id)
+					conn.Write([]byte("Removing connection from " + name + "...\n"))
+					s.RemoveDatabase(connId)
+					conn.Write([]byte("Removing database from " + name + "...\n"))
+				}
 			}
 
 		case "quit":

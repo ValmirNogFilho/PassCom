@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // Envia heartbeats constantemente para todos os servidores no mapa Connections
@@ -36,12 +34,11 @@ func (s *System) sendHeartbeats() {
 func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 	defer s.wg.Done()
 
-	// Criar a mensagem do heartbeat
-	heartbeat := models.Message{
-		Id:          uuid.New().String(),
-		From:        s.ServerId.String(),
-		VectorClock: s.VectorClock,
-		Body:        "Heartbeat",
+	heartbeat, err := models.CreateMessage(s.ServerId.String(), id, s.VectorClock, "Heartbeat")
+
+	if err != nil {
+		log.Printf("Error creating heartbeat message: %v", err)
+		return
 	}
 
 	// Serializar a mensagem de heartbeat
@@ -56,7 +53,7 @@ func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating heartbeat request: %v", err)
-		s.updateConnectionStatus(id, false)
+		s.UpdateConnectionStatus(id, false)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -69,9 +66,9 @@ func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 	// Verifica se houve erro na resposta ou se o servidor está offline
 	if err != nil || resp.StatusCode != http.StatusOK {
 		log.Printf("Connection %s is offline", s.Connections[id].Name)
-		s.updateConnectionStatus(id, false)
+		s.UpdateConnectionStatus(id, false)
 	} else {
-		s.updateConnectionStatus(id, true)
+		s.UpdateConnectionStatus(id, true)
 	}
 	if resp != nil {
 		resp.Body.Close()

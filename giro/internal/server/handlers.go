@@ -451,7 +451,7 @@ func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		s.removeConnection(message.From)
+		s.RemoveConnection(message.From)
 		log.Printf("Connection removed for server %s", message.From)
 
 		w.WriteHeader(http.StatusOK)
