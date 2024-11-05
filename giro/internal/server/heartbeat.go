@@ -103,13 +103,12 @@ func (s *System) sendHeartbeatToConnection(id string, conn models.Connection) {
 	log.Printf("Sending heartbeat to %s", s.Connections[id].Name)
 	resp, err := client.Do(req)
 
-	// Verifica se houve erro na resposta ou se o servidor está offline
-	if err != nil || resp.StatusCode != http.StatusOK {
+	online := err == nil && resp != nil && resp.StatusCode == http.StatusOK
+	if !online {
 		log.Printf("Connection %s is offline", s.Connections[id].Name)
-		s.UpdateConnectionStatus(id, false)
-	} else {
-		s.UpdateConnectionStatus(id, true)
 	}
+	s.UpdateConnectionStatus(id, online)
+
 	if resp != nil {
 		resp.Body.Close()
 	}

@@ -1,6 +1,19 @@
 {
-  "Address": "172.18.0.2",
-  "Connections": {},
+  "Address": "172.19.0.3",
+  "Connections": {
+    "a8c7274b-ed05-450e-8d7c-28b513ce122e": {
+      "Name": "giro",
+      "Address": "giro",
+      "Port": "8888",
+      "IsOnline": true
+    },
+    "de114b9e-df3b-4379-8f52-999afb2d60fb": {
+      "Name": "boreal",
+      "Address": "boreal",
+      "Port": "9999",
+      "IsOnline": false
+    }
+  },
   "Log": [
     {
       "timestamp": "0001-01-01T00:00:00Z",
@@ -6007,6 +6020,8 @@
   "ServerId": "d5ff2547-6730-45d5-8eaf-ab83e016df09",
   "ServerName": "rumos",
   "VectorClock": {
-    "d5ff2547-6730-45d5-8eaf-ab83e016df09": 1
+    "a8c7274b-ed05-450e-8d7c-28b513ce122e": 260,
+    "d5ff2547-6730-45d5-8eaf-ab83e016df09": 260,
+    "de114b9e-df3b-4379-8f52-999afb2d60fb": 208
   }
 }
