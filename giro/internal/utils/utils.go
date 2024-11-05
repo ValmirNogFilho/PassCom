@@ -1,6 +1,11 @@
 package utils
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+)
 
 // Filter is a generic function that filters a slice of items based on a predicate function.
 // It returns a new slice containing only the elements for which the predicate function returns true.
@@ -45,4 +50,12 @@ func PrintMap[V any](m map[string]V) string {
 		str += fmt.Sprintf("\n%v: %v", k, v)
 	}
 	return str + "\n}"
+}
+
+func SendJSONResponse(w http.ResponseWriter, data interface{}, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		log.Printf("Error encoding JSON response: %v", err)
+	}
 }

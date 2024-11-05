@@ -6,7 +6,80 @@ import (
 	"giro/internal/models"
 	"log"
 	"net/http"
+	"strconv"
 )
+
+func handleWishlist(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	switch r.Method {
+	case http.MethodGet:
+		handleGetWishlist(w, r)
+	case http.MethodPost:
+		handleAddToWishlist(w, r)
+	case http.MethodDelete:
+		handleRemoveFromWishlist(w, r)
+	default:
+		http.Error(w, "only GET, POST, DELETE allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func handleRemoveFromWishlist(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	token := r.Header.Get("Authorization")
+
+	queryParams := r.URL.Query()
+
+	id := queryParams.Get("id")
+
+	idUint, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		returnResponse(w, r, models.Response{
+			Status: http.StatusBadRequest,
+		})
+		return
+	}
+
+	response := DeleteFromWishlist(uint(idUint),
+		models.Request{
+			Auth: token,
+		},
+	)
+
+	returnResponse(w, r, response)
+}
+
+func handleAddToWishlist(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	token := r.Header.Get("Authorization")
+
+	var addWish models.WishlistOperation
+
+	err := json.NewDecoder(r.Body).Decode(&addWish)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	response := AddToWishlist(
+		models.Request{
+			Auth: token,
+			Data: addWish,
+		},
+	)
+	returnResponse(w, r, response)
+}
+
+func handleGetWishlist(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("Authorization")
+	response := GetWishlist(
+		models.Request{
+			Auth: token,
+		},
+	)
+	returnResponse(w, r, response)
+}
 
 func GetWishlist(req models.Request) models.Response {
 	session, exists := SessionIfExists(req.Auth)

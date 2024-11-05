@@ -1,12 +1,14 @@
 package server
 
 import (
+	"bufio"
 	"encoding/json"
-	"giro/internal/dao"
 	"giro/internal/models"
 	"log"
+	"net"
 	"net/http"
-	"strconv"
+	"strings"
+	"syscall"
 )
 
 // allowCrossOrigin is a middleware function that handles Cross-Origin Resource Sharing (CORS)
@@ -27,497 +29,125 @@ func allowCrossOrigin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleWishlist(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	switch r.Method {
-	case http.MethodGet:
-		handleGetWishlist(w, r)
-	case http.MethodPost:
-		handleAddToWishlist(w, r)
-	case http.MethodDelete:
-		handleRemoveFromWishlist(w, r)
-	default:
-		http.Error(w, "only GET, POST, DELETE allowed", http.StatusMethodNotAllowed)
-		return
-	}
-}
-
-func handleRemoveFromWishlist(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	token := r.Header.Get("Authorization")
-
-	queryParams := r.URL.Query()
-
-	id := queryParams.Get("id")
-
-	idUint, err := strconv.ParseUint(id, 10, 32)
-	if err != nil {
-		returnResponse(w, r, models.Response{
-			Status: http.StatusBadRequest,
-		})
-		return
-	}
-
-	response := DeleteFromWishlist(uint(idUint),
-		models.Request{
-			Auth: token,
-		},
-	)
-
-	returnResponse(w, r, response)
-}
-
-func handleAddToWishlist(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	token := r.Header.Get("Authorization")
-
-	var addWish models.WishlistOperation
-
-	err := json.NewDecoder(r.Body).Decode(&addWish)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	response := AddToWishlist(
-		models.Request{
-			Auth: token,
-			Data: addWish,
-		},
-	)
-	returnResponse(w, r, response)
-}
-
-func handleGetWishlist(w http.ResponseWriter, r *http.Request) {
-	token := r.Header.Get("Authorization")
-	response := GetWishlist(
-		models.Request{
-			Auth: token,
-		},
-	)
-	returnResponse(w, r, response)
-}
-
-func handleGetAirports(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-	response := GetAirports(
-		models.Request{
-			Auth: token,
-		},
-	)
-
-	returnResponse(w, r, response)
-}
-
-// handleGetTickets handles HTTP GET requests to retrieve a list of tickets for the authenticated user.
-// It checks the request method to ensure it's a GET request and retrieves the user's authorization token from the request headers.
-// It then constructs a Request object with the appropriate action and authorization token, and sends it to the
-// The server's response is then decoded and returned as a JSON object in the HTTP response.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleGetTickets(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-	response := GetTickets(
-		models.Request{
-			Auth: token,
-		},
-	)
-
-	returnResponse(w, r, response)
-}
-
-// handleTicket is a HTTP handler function that handles requests for buying and canceling tickets.
-// It checks the HTTP method of the request and calls the appropriate handler function based on the method.
-// If the method is neither POST nor DELETE, it returns a 405 Method Not Allowed status with an error message.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleTicket(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	switch r.Method {
-	case http.MethodPost:
-		handleBuyTicket(w, r)
-	case http.MethodDelete:
-		handleCancelTicket(w, r)
-	default:
-		http.Error(w, "only POST or DELETE allowed", http.StatusMethodNotAllowed)
-		return
-	}
-}
-
-// handleBuyTicket is a HTTP handler function that handles requests for buying tickets.
-// It extracts the user's authorization token from the request headers and decodes the request body into a BuyTicket struct.
-// If the decoding fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action, authorization token, and buy ticket data,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleBuyTicket(w http.ResponseWriter, r *http.Request) {
-	token := r.Header.Get("Authorization")
-	var buyTicket models.BuyTicket
-
-	err := json.NewDecoder(r.Body).Decode(&buyTicket)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	response := BuyTicket(models.Request{
-		Auth: token,
-		Data: buyTicket,
-	})
-
-	returnResponse(w, r, response)
-
-}
-
-// handleCancelTicket is a HTTP handler function that handles requests for canceling tickets.
-// It extracts the user's authorization token from the request headers and decodes the request body into a CancelBuyRequest struct.
-// If the decoding fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action, authorization token, and cancel ticket data,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleCancelTicket(w http.ResponseWriter, r *http.Request) {
-
-	token := r.Header.Get("Authorization")
-
-	queryParams := r.URL.Query()
-
-	id := queryParams.Get("id")
-
-	idUint, err := strconv.ParseUint(id, 10, 32)
-
-	if err != nil {
-		returnResponse(w, r, models.Response{
-			Error:  err.Error(),
-			Status: http.StatusBadRequest,
-		})
-	}
-
-	response := CancelBuy(uint(idUint), models.Request{
-		Auth: token,
-	})
-	returnResponse(w, r, response)
-}
-
-// handleGetFlights is an HTTP handler function that retrieves flight information based on the provided flight IDs.
-// It checks the HTTP method of the request to ensure it's a POST request.
-// If the method is not POST, it returns a 405 Method Not Allowed status with an error message.
-// It extracts the user's authorization token from the request headers and decodes the request body into a FlightsRequest struct.
-// If the decoding fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action, authorization token, and flight IDs,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleGetFlights(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-
-	var flightIds models.FlightsRequest
-	err := json.NewDecoder(r.Body).Decode(&flightIds)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	response := Flights(models.Request{
-		Auth: token,
-		Data: flightIds,
-	})
-
-	returnResponse(w, r, response)
-}
-
-// handleGetRoute is an HTTP handler function that retrieves route information based on the provided source and destination.
-// It checks the HTTP method of the request to ensure it's a GET request.
-// If the method is not GET, it returns a 405 Method Not Allowed status with an error message.
-// It extracts the source and destination from the request query parameters and the user's authorization token from the request headers.
-// It then constructs a Request object with the appropriate action, authorization token, and route request data,
-// and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleGetRoute(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	queryParams := r.URL.Query()
-
-	src := queryParams.Get("src")
-	dest := queryParams.Get("dest")
-
-	token := r.Header.Get("Authorization")
-	response := Route(models.Request{
-		Auth: token,
-		Data: models.RouteRequest{
-			Source: src,
-			Dest:   dest,
-		}})
-	returnResponse(w, r, response)
-}
-
-// handleGetUser is an HTTP handler function that retrieves user information.
-// It checks the HTTP method of the request to ensure it's a GET request.
-// If the method is not GET, it returns a 405 Method Not Allowed status with an error message.
-// It extracts the user's authorization token from the request headers and constructs a Request object
-// with the appropriate action and authorization token.
-// The constructed Request object is then sent to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleGetUser(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-
-	response := GetUserBySessionToken(models.Request{Auth: token})
-
-	returnResponse(w, r, response)
-
-}
-
-// handleLogout handles HTTP GET requests to log out the authenticated user.
-// It checks the request method to ensure it's a GET request and retrieves the user's authorization token from the request headers.
-// It then constructs a Request object with the appropriate action and authorization token, and sends it to the
-// The server's response is then returned as a JSON object in the HTTP response.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleLogout(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-	if r.Method != http.MethodGet {
-		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-	req := models.Request{Auth: token}
-	response := Logout(req)
-
-	returnResponse(w, r, response)
-}
-
-// handleLogin handles HTTP POST requests to log in the authenticated user.
-// It checks the request method to ensure it's a POST request and retrieves the user's login credentials from the request body.
-// If the method is not POST, it returns a 405 Method Not Allowed status with an error message.
-// If the decoding of the login credentials fails, it returns a 400 Bad Request status.
-// It then constructs a Request object with the appropriate action and login credentials, and sends it to the server using the writeAndReturnResponse function.
-//
-// Parameters:
-//   - w: http.ResponseWriter to write the HTTP response.
-//   - r: *http.Request to read the HTTP request.
-func handleLogin(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var logCred models.LoginCredentials
-	err := json.NewDecoder(r.Body).Decode(&logCred)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	responseData := Login(logCred)
-	returnResponse(w, r, responseData)
-}
-
 func returnResponse(w http.ResponseWriter, r *http.Request, responseData models.Response) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(responseData.Status)
 	json.NewEncoder(w).Encode(responseData)
 }
 
-func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
-	allowCrossOrigin(w, r)
+// HandleCLIServer starts a TCP server listening on the specified CLIPORT.
+// This server accepts incoming connections and handles them using the handleCLIConnection function.
+// The server logs any errors during initialization, listening, or accepting connections.
+//
+// The function performs the following steps:
+// 1. Listens for incoming TCP connections on the specified CLIPORT.
+// 2. If an error occurs during listening, logs the error and terminates the program.
+// 3. Accepts incoming connections and starts a new goroutine to handle each connection using the handleCLIConnection function.
+// 4. Logs any errors that occur during connection acceptance.
+func (s *System) HandleCLIServer() {
+	listener, err := net.Listen("tcp", CLIPORT)
+	if err != nil {
+		log.Fatal("Error initiating server:", err)
+	}
+	defer listener.Close()
 
-	// Verifica o método da solicitação
-	switch r.Method {
-	case http.MethodPost:
-		// Processa a solicitação para adicionar uma nova conexão
-		var message models.Message
-		err := json.NewDecoder(r.Body).Decode(&message)
+	log.Println("See your server working on the TCP CLI server on port", CLIPORT)
+
+	for {
+		conn, err := listener.Accept()
 		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
-			return
+			log.Println("Error accepting connection:", err)
+			continue
 		}
 
-		// Decodifica o Body para map[string]interface{} para acessar Address e Port
-		body, ok := message.Body.(map[string]interface{})
-		if !ok {
-			http.Error(w, "Invalid body format", http.StatusBadRequest)
-			return
-		}
-
-		name, ok := body["Name"].(string)
-		if !ok {
-			http.Error(w, "Invalid name format", http.StatusBadRequest)
-			return
-		}
-
-		address, ok := body["Address"].(string)
-		if !ok {
-			http.Error(w, "Invalid Address format", http.StatusBadRequest)
-			return
-		}
-
-		port, ok := body["Port"].(string)
-		if !ok {
-			http.Error(w, "Invalid Port format", http.StatusBadRequest)
-			return
-		}
-
-		// Cria uma nova conexão com os dados extraídos
-		newConnection := models.Connection{
-			Name:     name,
-			Address:  address,
-			Port:     port,
-			IsOnline: true,
-		}
-
-		// Adiciona a nova conexão ao sistema
-		err = s.AddConnection(message.From, newConnection)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		log.Printf("New connection from %s: %s:%s", message.From, address, port)
-
-		// Monta a resposta como models.Message contendo o novo models.Connection
-		responseMessage, err := models.CreateMessage(s.ServerId.String(), message.From, s.VectorClock, map[string]interface{}{"Name": s.ServerName})
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// Define o cabeçalho Content-Type e envia o JSON da resposta
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		if err := json.NewEncoder(w).Encode(responseMessage); err != nil {
-			http.Error(w, "Failed to encode response message", http.StatusInternalServerError)
-		}
-
-	case http.MethodDelete:
-		// Processa a solicitação para remover uma conexão existente
-		var message models.Message
-		err := json.NewDecoder(r.Body).Decode(&message)
-		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
-			return
-		}
-
-		s.RemoveConnection(message.From)
-		log.Printf("Connection removed for server %s", message.From)
-
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Connection removed successfully"))
-
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		go s.handleCLIConnection(conn)
 	}
 }
 
-func (s *System) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
-	// Define o tipo de resposta e status OK
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+// handleCLIConnection handles incoming connections from the CLI server.
+// It reads commands from the connection, processes them, and responds accordingly.
+//
+// Parameters:
+// - conn: The net.Conn object representing the connection from the client.
+//
+// Return:
+// This function does not return any value.
+func (s *System) handleCLIConnection(conn net.Conn) {
+	defer conn.Close()
+	conn.Write([]byte("Welcome to the CLI server!\nType 'help' to see the commands.\n"))
 
-	// Decodifica o *heartbeat* recebido
-	var receivedMessage models.Message
-	if err := json.NewDecoder(r.Body).Decode(&receivedMessage); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		input := strings.TrimSpace(scanner.Text())
+		parts := strings.Fields(input)
 
-	// Bloqueia o mutex para manipular o VectorClock de maneira segura
-	s.Lock.Lock()
-	defer s.Lock.Unlock()
+		if len(parts) == 0 {
+			conn.Write([]byte("Empty command.\n"))
+			continue
+		}
 
-	// Incrementa o relógio do sistema para indicar que o heartbeat foi recebido
-	s.IncrementClock()
+		command := parts[0]
+		args := parts[1:]
 
-	log.Print("Received heartbeat from ", s.Connections[receivedMessage.From].Name)
+		switch command {
+		case "help":
+			conn.Write(
+				[]byte("Available commands:" +
+					"\n- help: to see commands" +
+					"\n- info: to see server informations" +
+					"\n- addconn <address> <port>: to add a new connection" +
+					"\n- quit: to close the connection" +
+					"\n- shutdown: to shut down the server\n"))
 
-	// Atualiza o VectorClock com base no *heartbeat* recebido
-	s.UpdateClock(receivedMessage.VectorClock)
+		case "info":
+			conn.Write([]byte(s.getServerInfo()))
 
-	// Cria uma nova mensagem de resposta com o VectorClock atualizado
-	responseMessage, err := models.CreateMessage(s.ServerId.String(), receivedMessage.From, s.VectorClock, "Healthy")
+		case "addconn":
+			if len(args) < 2 {
+				conn.Write([]byte("Error: 'addconn' requires two arguments (address, port).\n"))
+			} else {
+				address := args[0]
+				connPort := args[1]
+				conn.Write([]byte("Requesting connection to " + address + ":" + connPort + "...\n"))
+				s.RequestConnection(address, connPort)
+				conn.Write([]byte("Requesting database from " + address + ":" + connPort + "...\n"))
+				s.RequestDatabase(address, connPort)
+				conn.Write([]byte("Sending database to " + address + ":" + connPort + "...\n"))
+				s.SendDatabase(address, connPort)
+			}
 
-	if err != nil {
-		log.Printf("Error creating heartbeat response message: %v", err)
-		return
-	}
+		case "rmconn":
+			if len(args) < 1 {
+				conn.Write([]byte("Error: 'rmconn' requires one argument (connection ID).\n"))
+			} else {
+				connId := args[0]
+				id, serverConn := s.FindConnectionByName(connId)
+				if serverConn == nil {
+					conn.Write([]byte("Connection not found.\n"))
+				} else {
+					name := serverConn.Name
+					conn.Write([]byte("Requested disconnection from " + serverConn.Address + ":" + serverConn.Port + "...\n"))
+					s.RequestDisconnection(serverConn.Address, serverConn.Port)
+					conn.Write([]byte("Removing connection from " + name + "...\n"))
+					s.RemoveConnection(id)
+					conn.Write([]byte("Removing database from " + name + "...\n"))
+					s.RemoveDatabase(connId)
+				}
+			}
 
-	// Codifica a mensagem de resposta como JSON
-	if err := json.NewEncoder(w).Encode(responseMessage); err != nil {
-		log.Printf("Error encoding heartbeat response: %v", err)
-	}
+		case "quit":
+			conn.Write([]byte("Closing CLI...\n"))
+			return
 
-	log.Print("Sent heartbeat response to ", s.Connections[receivedMessage.From].Name)
-}
+		case "shutdown":
+			conn.Write([]byte("Shutting down the server...\n"))
+			go func() {
+				s.shutdown <- syscall.SIGTERM
+			}()
+			return
 
-func (s *System) handleDatabase(w http.ResponseWriter, r *http.Request) {
-	// Define o tipo de resposta como JSON e status OK
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	// Usa o DAO para buscar todos os voos cujo campo Company é igual a s.ServerName
-	flights, err := dao.GetFlightDAO().FindByCompany(s.ServerName)
-	if err != nil {
-		http.Error(w, "Failed to retrieve flights", http.StatusInternalServerError)
-		log.Printf("Error retrieving flights from database: %v", err)
-		return
-	}
-
-	// Codifica a lista de voos como JSON e envia na resposta
-	if err := json.NewEncoder(w).Encode(flights); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-		log.Printf("Error encoding flights to JSON: %v", err)
+		default:
+			conn.Write([]byte("Command not found.\n"))
+		}
 	}
 }

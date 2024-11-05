@@ -9,6 +9,81 @@ import (
 	"time"
 )
 
+// handleGetUser is an HTTP handler function that retrieves user information.
+// It checks the HTTP method of the request to ensure it's a GET request.
+// If the method is not GET, it returns a 405 Method Not Allowed status with an error message.
+// It extracts the user's authorization token from the request headers and constructs a Request object
+// with the appropriate action and authorization token.
+// The constructed Request object is then sent to the server using the writeAndReturnResponse function.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleGetUser(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	if r.Method != http.MethodGet {
+		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := r.Header.Get("Authorization")
+
+	response := GetUserBySessionToken(models.Request{Auth: token})
+
+	returnResponse(w, r, response)
+
+}
+
+// handleLogout handles HTTP GET requests to log out the authenticated user.
+// It checks the request method to ensure it's a GET request and retrieves the user's authorization token from the request headers.
+// It then constructs a Request object with the appropriate action and authorization token, and sends it to the
+// The server's response is then returned as a JSON object in the HTTP response.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	if r.Method != http.MethodGet {
+		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := r.Header.Get("Authorization")
+	req := models.Request{Auth: token}
+	response := Logout(req)
+
+	returnResponse(w, r, response)
+}
+
+// handleLogin handles HTTP POST requests to log in the authenticated user.
+// It checks the request method to ensure it's a POST request and retrieves the user's login credentials from the request body.
+// If the method is not POST, it returns a 405 Method Not Allowed status with an error message.
+// If the decoding of the login credentials fails, it returns a 400 Bad Request status.
+// It then constructs a Request object with the appropriate action and login credentials, and sends it to the server using the writeAndReturnResponse function.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var logCred models.LoginCredentials
+	err := json.NewDecoder(r.Body).Decode(&logCred)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	responseData := Login(logCred)
+	returnResponse(w, r, responseData)
+}
+
 // passwordMatches checks if the provided password matches the password stored in the client's record.
 //
 // Parameters:

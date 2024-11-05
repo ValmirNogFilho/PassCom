@@ -8,6 +8,97 @@ import (
 	"net/http"
 )
 
+func (s *System) handleConnect(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+
+	// Verifica o método da solicitação
+	switch r.Method {
+	case http.MethodPost:
+		// Processa a solicitação para adicionar uma nova conexão
+		var message models.Message
+		err := json.NewDecoder(r.Body).Decode(&message)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		// Decodifica o Body para map[string]interface{} para acessar Address e Port
+		body, ok := message.Body.(map[string]interface{})
+		if !ok {
+			http.Error(w, "Invalid body format", http.StatusBadRequest)
+			return
+		}
+
+		name, ok := body["Name"].(string)
+		if !ok {
+			http.Error(w, "Invalid name format", http.StatusBadRequest)
+			return
+		}
+
+		address, ok := body["Address"].(string)
+		if !ok {
+			http.Error(w, "Invalid Address format", http.StatusBadRequest)
+			return
+		}
+
+		port, ok := body["Port"].(string)
+		if !ok {
+			http.Error(w, "Invalid Port format", http.StatusBadRequest)
+			return
+		}
+
+		// Cria uma nova conexão com os dados extraídos
+		newConnection := models.Connection{
+			Name:     name,
+			Address:  address,
+			Port:     port,
+			IsOnline: true,
+		}
+
+		// Adiciona a nova conexão ao sistema
+		err = s.AddConnection(message.From, newConnection)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("New connection from %s: %s:%s", message.From, address, port)
+
+		// Monta a resposta como models.Message contendo o novo models.Connection
+		responseMessage, err := models.CreateMessage(s.ServerId.String(), message.From, s.VectorClock, map[string]interface{}{"Name": s.ServerName})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Define o cabeçalho Content-Type e envia o JSON da resposta
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		if err := json.NewEncoder(w).Encode(responseMessage); err != nil {
+			http.Error(w, "Failed to encode response message", http.StatusInternalServerError)
+		}
+
+	case http.MethodDelete:
+		// Processa a solicitação para remover uma conexão existente
+		var message models.Message
+		err := json.NewDecoder(r.Body).Decode(&message)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		s.RemoveConnection(message.From)
+		log.Printf("Connection removed for server %s", message.From)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Connection removed successfully"))
+
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
 func (s *System) AddConnection(id string, conn models.Connection) error {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()

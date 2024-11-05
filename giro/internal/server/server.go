@@ -1,17 +1,14 @@
 package server
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"giro/internal/models"
 	"giro/internal/utils"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -214,136 +211,29 @@ func (s *System) StartServer() error {
 	}
 }
 
-func (s *System) shutdownServer(server *http.Server) error {
-	log.Println("Server shutting down...")
-
-	// Espere todas as goroutines terminarem
-	s.wg.Wait()
-
-	// Bloqueie o mutex para escrever em arquivo
-	s.Lock.Lock()
-	defer s.Lock.Unlock()
-
-	// Salve os dados do sistema em um arquivo
-	s.storeSystemVars(INSTANCE_PATH)
-
-	// Fecha o servidor
-	return server.Close()
-}
-
-// HandleCLIServer starts a TCP server listening on the specified CLIPORT.
-// This server accepts incoming connections and handles them using the handleCLIConnection function.
-// The server logs any errors during initialization, listening, or accepting connections.
-//
-// The function performs the following steps:
-// 1. Listens for incoming TCP connections on the specified CLIPORT.
-// 2. If an error occurs during listening, logs the error and terminates the program.
-// 3. Accepts incoming connections and starts a new goroutine to handle each connection using the handleCLIConnection function.
-// 4. Logs any errors that occur during connection acceptance.
-func (s *System) HandleCLIServer() {
-	listener, err := net.Listen("tcp", CLIPORT)
-	if err != nil {
-		log.Fatal("Error initiating server:", err)
-	}
-	defer listener.Close()
-
-	log.Println("See your server working on the TCP CLI server on port", CLIPORT)
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Println("Error accepting connection:", err)
-			continue
-		}
-
-		go s.handleCLIConnection(conn)
-	}
-}
-
-// handleCLIConnection handles incoming connections from the CLI server.
-// It reads commands from the connection, processes them, and responds accordingly.
+// shutdownServer gracefully shuts down the server by waiting for all goroutines to finish,
+// saving the system variables to a file, and closing the HTTP server.
 //
 // Parameters:
-// - conn: The net.Conn object representing the connection from the client.
+// - server: A pointer to the http.Server instance representing the server.
 //
 // Return:
-// This function does not return any value.
-func (s *System) handleCLIConnection(conn net.Conn) {
-	defer conn.Close()
-	conn.Write([]byte("Welcome to the CLI server!\nType 'help' to see the commands.\n"))
+// - An error if the server fails to close gracefully. Returns nil if the shutdown is successful.
+func (s *System) shutdownServer(server *http.Server) error {
+    log.Println("Server shutting down...")
 
-	scanner := bufio.NewScanner(conn)
-	for scanner.Scan() {
-		input := strings.TrimSpace(scanner.Text())
-		parts := strings.Fields(input)
+    // Wait for all goroutines to finish
+    s.wg.Wait()
 
-		if len(parts) == 0 {
-			conn.Write([]byte("Empty command.\n"))
-			continue
-		}
+    // Lock the mutex to ensure atomic access when writing to file
+    s.Lock.Lock()
+    defer s.Lock.Unlock()
 
-		command := parts[0]
-		args := parts[1:]
+    // Save the system variables to a file
+    s.storeSystemVars(INSTANCE_PATH)
 
-		switch command {
-		case "help":
-			conn.Write(
-				[]byte("Available commands:" +
-					"\n- help: to see commands" +
-					"\n- info: to see server informations" +
-					"\n- addconn <address> <port>: to add a new connection" +
-					"\n- quit: to close the connection" +
-					"\n- shutdown: to shut down the server\n"))
-
-		case "info":
-			conn.Write([]byte(s.getServerInfo()))
-
-		case "addconn":
-			if len(args) < 2 {
-				conn.Write([]byte("Error: 'addconn' requires two arguments (address, port).\n"))
-			} else {
-				address := args[0]
-				connPort := args[1]
-				s.RequestConnection(address, connPort)
-				conn.Write([]byte("Requesting connection to " + address + ":" + connPort + "...\n"))
-				s.RequestDatabase(address, connPort)
-				conn.Write([]byte("Requesting database from " + address + ":" + connPort + "...\n"))
-			}
-
-		case "rmconn":
-			if len(args) < 1 {
-				conn.Write([]byte("Error: 'rmconn' requires one argument (connection ID).\n"))
-			} else {
-				connId := args[0]
-				id, serverConn := s.FindConnectionByName(connId)
-				if serverConn == nil {
-					conn.Write([]byte("Connection not found.\n"))
-				} else {
-					name := serverConn.Name
-					s.RequestDisconnection(serverConn.Address, serverConn.Port)
-					conn.Write([]byte("Requested disconnection from " + serverConn.Address + ":" + serverConn.Port + "...\n"))
-					s.RemoveConnection(id)
-					conn.Write([]byte("Removing connection from " + name + "...\n"))
-					s.RemoveDatabase(connId)
-					conn.Write([]byte("Removing database from " + name + "...\n"))
-				}
-			}
-
-		case "quit":
-			conn.Write([]byte("Closing CLI...\n"))
-			return
-
-		case "shutdown":
-			conn.Write([]byte("Shutting down the server...\n"))
-			go func() {
-				s.shutdown <- syscall.SIGTERM
-			}()
-			return
-
-		default:
-			conn.Write([]byte("Command not found.\n"))
-		}
-	}
+    // Close the HTTP server
+    return server.Close()
 }
 
 // getServerInfo returns a formatted string containing information about the server.

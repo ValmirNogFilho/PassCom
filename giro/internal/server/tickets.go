@@ -5,7 +5,114 @@ import (
 	"giro/internal/dao"
 	"giro/internal/models"
 	"net/http"
+	"strconv"
 )
+
+// handleGetTickets handles HTTP GET requests to retrieve a list of tickets for the authenticated user.
+// It checks the request method to ensure it's a GET request and retrieves the user's authorization token from the request headers.
+// It then constructs a Request object with the appropriate action and authorization token, and sends it to the
+// The server's response is then decoded and returned as a JSON object in the HTTP response.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleGetTickets(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "only GET allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := r.Header.Get("Authorization")
+	response := GetTickets(
+		models.Request{
+			Auth: token,
+		},
+	)
+
+	returnResponse(w, r, response)
+}
+
+// handleTicket is a HTTP handler function that handles requests for buying and canceling tickets.
+// It checks the HTTP method of the request and calls the appropriate handler function based on the method.
+// If the method is neither POST nor DELETE, it returns a 405 Method Not Allowed status with an error message.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleTicket(w http.ResponseWriter, r *http.Request) {
+	allowCrossOrigin(w, r)
+	switch r.Method {
+	case http.MethodPost:
+		handleBuyTicket(w, r)
+	case http.MethodDelete:
+		handleCancelTicket(w, r)
+	default:
+		http.Error(w, "only POST or DELETE allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+// handleBuyTicket is a HTTP handler function that handles requests for buying tickets.
+// It extracts the user's authorization token from the request headers and decodes the request body into a BuyTicket struct.
+// If the decoding fails, it returns a 400 Bad Request status.
+// It then constructs a Request object with the appropriate action, authorization token, and buy ticket data,
+// and sends it to the server using the writeAndReturnResponse function.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleBuyTicket(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("Authorization")
+	var buyTicket models.BuyTicket
+
+	err := json.NewDecoder(r.Body).Decode(&buyTicket)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	response := BuyTicket(models.Request{
+		Auth: token,
+		Data: buyTicket,
+	})
+
+	returnResponse(w, r, response)
+
+}
+
+// handleCancelTicket is a HTTP handler function that handles requests for canceling tickets.
+// It extracts the user's authorization token from the request headers and decodes the request body into a CancelBuyRequest struct.
+// If the decoding fails, it returns a 400 Bad Request status.
+// It then constructs a Request object with the appropriate action, authorization token, and cancel ticket data,
+// and sends it to the server using the writeAndReturnResponse function.
+//
+// Parameters:
+//   - w: http.ResponseWriter to write the HTTP response.
+//   - r: *http.Request to read the HTTP request.
+func handleCancelTicket(w http.ResponseWriter, r *http.Request) {
+
+	token := r.Header.Get("Authorization")
+
+	queryParams := r.URL.Query()
+
+	id := queryParams.Get("id")
+
+	idUint, err := strconv.ParseUint(id, 10, 32)
+
+	if err != nil {
+		returnResponse(w, r, models.Response{
+			Error:  err.Error(),
+			Status: http.StatusBadRequest,
+		})
+	}
+
+	response := CancelBuy(uint(idUint), models.Request{
+		Auth: token,
+	})
+	returnResponse(w, r, response)
+}
 
 // GetTickets retrieves all tickets associated with the authenticated client.
 // It sends a response containing a list of tickets with their respective source, destination, and ID.
