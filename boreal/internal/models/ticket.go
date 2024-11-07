@@ -6,6 +6,8 @@ import (
 
 type Ticket struct {
 	gorm.Model
+	FlightSrcCity string
+	FlightDestCity string
 	ClientId uint   `gorm:"not null;constraint:OnDelete:CASCADE"` // Chave estrangeira para Client
 	FlightId uint   `gorm:"not null;constraint:OnDelete:CASCADE"` // Chave estrangeira para Flight
 	UniqueId string `gorm:"unique_id;unique"`
