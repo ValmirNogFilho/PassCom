@@ -30,7 +30,7 @@ func (dao *DBFlightDAO) FindAll() []models.Flight {
 
 	var flights []models.Flight = make([]models.Flight, 0)
 
-	db.Find(&flights)
+	db.Where("deleted_at IS NULL").Find(&flights)
 
 	return flights
 }
@@ -103,7 +103,8 @@ func (dao *DBFlightDAO) FindById(id uint) (*models.Flight, error) {
 
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
-		Preload("Tickets").First(&flight, "id=?", id).Error; err != nil {
+		Preload("Tickets").
+		Where("id = ? AND deleted_at IS NULL", id).First(&flight).Error; err != nil {
 		log.Println("Error searching flight:", err)
 		return nil, err
 	}
@@ -123,8 +124,9 @@ func (dao *DBFlightDAO) FindBySource(id uint) ([]models.Flight, error) {
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
 		Preload("Tickets").Where(&models.Flight{
-		OriginAirportID: id,
-	}).Find(&flights).Error; err != nil {
+		OriginAirportID: id,	
+		}).Where("deleted_at IS NULL").
+		Find(&flights).Error; err != nil {
 		log.Println("Error searching flights:", err)
 		return nil, err
 	}
@@ -148,7 +150,8 @@ func (dao *DBFlightDAO) FindBySourceAndDest(source uint, dest uint) ([]models.Fl
 		Where(&models.Flight{
 			OriginAirportID:      source,
 			DestinationAirportID: dest,
-		}).Find(&flights).Error; err != nil {
+		}).Where("deleted_at IS NULL").
+		Find(&flights).Error; err != nil {
 		log.Println("Error searching flight:", err)
 		return nil, err
 	}
@@ -166,6 +169,7 @@ func (dao *DBFlightDAO) FindPathBFS(source uint, dest uint) ([]models.Flight, er
 	var flights []models.Flight
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
+		Where("deleted_at IS NULL").
 		Find(&flights).Error; err != nil {
 		log.Println("Error loading flights:", err)
 		return nil, err
@@ -224,7 +228,7 @@ func (dao *DBFlightDAO) FindByCompany(company string) ([]models.Flight, error) {
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
 		Preload("Tickets").
-		Where("company = ?", company).
+		Where("company = ? AND deleted_at IS NULL", company).
 		Find(&flights).Error; err != nil {
 		log.Println("Error finding flights by company:", err)
 		return nil, err
@@ -247,7 +251,7 @@ func (dao *DBFlightDAO) FindByUniqueId(uniqueId string) (*models.Flight, error) 
 	if err := db.Preload("OriginAirport").
 		Preload("DestinationAirport").
 		Preload("Tickets").
-		Where("unique_id = ?", uniqueId).
+		Where("unique_id = ? AND deleted_at IS NULL", uniqueId).
 		First(&flight).Error; err != nil {
 		log.Println("Error searching flight by unique ID:", err)
 		return nil, err

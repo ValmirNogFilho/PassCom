@@ -43,21 +43,23 @@ const Home = () => {
     fetchName()
   }, [])
 
-  const fetchFlights = async () => {
-    try {
-      const res = await apiService.getRoute({
-        src: srcValue,
-        dest: destValue,
-      });
-      setFlights(res.data.Data.paths);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const fetchFlights = async () => {
+      try {
+        const res = await apiService.getRoute({
+          src: srcValue,
+          dest: destValue,
+        });
+        setFlights(res.data.Data.paths.filter(f => f.Seats > 0));
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  if (srcValue !== "Origem" && destValue !== "Destino") {
-    fetchFlights();
-  }
+    if (srcValue !== "Origem" && destValue !== "Destino") {
+      fetchFlights();
+    }
+  }, [srcValue, destValue])
 
 
   return (
