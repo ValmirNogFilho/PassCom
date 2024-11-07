@@ -161,6 +161,4 @@ docker compose up --build
 
 Conclui-se que o sistema PassCom, apesar de possuir vulnerabilidades, é funcional e requeriu o estudo de uma série de técnicas de arquitetura, protocolo de comunicação, roteamento, concorrência distribuída e confiabilidade. Algumas melhorias podem ser feitas, como a implementação de algoritmos de consenso confiáveis e o reforço da robustez do sistema em caso de falhas, como, por exemplo, armazenar os logs das transações pendentes em disco.
 
-Ademais, alguns tópicos podem ser revisitados futuramente, como:
-
 Espera-se que a implementação do sistema PassCom contribua positivamente para a compreensão e aperfeiçoamento dos sistemas distribuídos no futuro.
