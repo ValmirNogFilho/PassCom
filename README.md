@@ -20,7 +20,12 @@ Stateless. Os servidores foram projetados para operar de forma independente e es
 
 De forma independente, o diagrama de sequência do sistema mostra a comunicação entre o cliente e o servidor. Nessa perspectiva, é possível visualizar o sistema distribuído como se fosse apenas um servidor centralizado.
 
+![Transação bem sucedida de um cliente com único servidor](docs/single-transaction-success.png)
+
+
 Quando o servidor de duas companhias estão conectados, eles trocam o banco de dados local entre si, tornando-se réplicas de si mesmo. Essa conexão é exemplificada pelo diagrama de sequência a seguir.
+
+![Conexão de um servidor com outro](docs/server-connection-diagram.png)
 
 A sincronização de dados é feita através de broadcast do voo quando é editado em seu servidor de origem.
 
@@ -42,6 +47,8 @@ Através de solicitações get, post, put e delete, são capazes de organizar a 
 
 O diagrama de sequência a seguir mostra o fluxo de comunicação entre os servidores quando o cliente deseja comprar uma passagem.
 
+![Transação bem sucedida entre servidores](docs/distributed-transaction-success.png)
+
 ## Roteamento
 
 Como cada servidor mantém uma réplica do banco de dados do outro quando eles se conectam, é possível determinar rotas entre os trechos dos servidores das companhias que estão conectados.
@@ -55,6 +62,8 @@ Quando um voo é editado, todos os servidores das companhias que estão conectad
 Além disso, o servidor não permite a venda da passagem de outro servidor que esteja offline, pois parte do pressuposto que não é possível determinar se o problema está localizado na rede ou se o servidor caiu.
 
 Algoritmos de consenso que possuem como alicerce a eleição de nós lideres, como Paxos e Raft, foram cogitados para o projeto. Todavia, a implementação destes foi descartada. Se deve ao fato de que algoritmos de consenso dessa forma impediria que os servidores pudessem operar de forma independente assim que não fosse possível se conectar a um quorum de servidores operando e recebendo mensagens.
+
+![Falha na transação](docs/distributed-transaction-fail.png)
 
 Portanto, o sistema permite que as informações sobre os vôos de outras companhias, como a quantidade de assentos disponíveis, estejam desatualizadas eventualmente caso a mensagem de broadcast não chegue ao servidor destinatário. Entretanto, nenhum servidor pode vender a passagem de um servidor que esteja offline.
 
