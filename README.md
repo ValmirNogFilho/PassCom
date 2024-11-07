@@ -8,7 +8,7 @@ O presente relatório visa descrever o desenvolvimento do sistema "PassCom", um 
 
 O projeto atendeu os requisitos de forma satisfatória pela confecção de um projeto com arquitetura flexível e escalável que visa a praticidade do uso para os usuários.
 
-### Equipe:
+### Equipe
 
 [![Pierre Machado](https://github.com/pierremachado.png?size=20)](https://github.com/pierremachado) [Pierre Machado](https://github.com/pierremachado)
 
