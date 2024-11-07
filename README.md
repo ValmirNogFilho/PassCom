@@ -110,7 +110,7 @@ Um algoritmo de Bread-First-Search forma o caminho mais curto a partir das rotas
 
 Para assegurar a consistência dos dados distribuídos de maneira descentralizada, foi utilizado o "gossip protocol". Trata-se de um algoritmo de consenso peer-to-peer para sistemas distribuídos focado em manter um estado síncrono entre todos os seus nós (no caso, os servidores). A abordagem peer-to-peer é um motivador para o uso do protocolo, visto que a equipe foi orientada a buscar por soluções descentralizadas.
 
-Segundo o "gossip protocol", quando um voo é editado, todos os servidores das companhias que estão conectados com os outros servidores do sistema notificam aos nós conectados essa alteração através de um broadcast; essa operação é idempotente, pois o servidor não pede para decrementar em um a quantidade de assentos, e sim envia o estado atual do voo e pede para os nós conectados substituirem as informações atuais. Portanto, se a mensagem chegar múltiplas vezes, será alterado apenas uma vez.
+Segundo o "gossip protocol", quando um voo é editado, todos os servidores das companhias que estão conectados com os outros servidores do sistema notificam aos nós conectados essa alteração através de um broadcast; essa operação é idempotente, pois o servidor não pede para decrementar em um a quantidade de assentos, e sim envia o estado atual do voo e pede para os nós conectados substituirem as informações atuais. Portanto, realizar a operação múltiplas vezes é o mesmo que realizar apenas uma vez.
 
 Além disso, o servidor não permite a venda da passagem de outro servidor que esteja offline, pois parte do pressuposto que não é possível determinar se o problema está localizado na rede ou se o servidor caiu.
 
